@@ -62,8 +62,6 @@ export const heroVariants = [
     lede:
       'The only end-to-end career engineering system built for internationals in Poland. We rebuild your CV and LinkedIn, run the applications and outreach every week, and get you ready for every interview.',
     chips: [
-      { label: 'Not coaching. We do the work.', href: '#what-this-is' },
-      { label: '3+ years of experience required', href: '#fit-criteria' },
       { label: '6,000 PLN to start', href: '#fee' },
     ],
     showVideo: false,

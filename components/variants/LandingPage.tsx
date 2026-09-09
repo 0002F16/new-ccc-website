@@ -1,5 +1,4 @@
 import { TwoSituations } from '@/components/sections/02-two-situations'
-import { WhatThisIs } from '@/components/sections/03-what-this-is'
 import { ThreeBottlenecks } from '@/components/sections/04-three-bottlenecks'
 import { Outcomes } from '@/components/sections/07-outcomes'
 import { TheWork } from '@/components/sections/09-the-work'
@@ -20,7 +19,6 @@ export function LandingPage({ variant }: { variant: HeroVariant }) {
       <main>
         <HeroVariantView variant={variant} />
         <TwoSituations />
-        <WhatThisIs />
 
         <MovementRule />
 
