@@ -2,7 +2,8 @@ import { LandingPage } from '@/components/variants/LandingPage'
 import { getHeroVariant } from '@/components/variants/hero-variants'
 
 /**
- * Six sections, down from twenty-one (9 September 2026).
+ * Five sections, down from twenty-one (9 September 2026), down to five on
+ * 10 September 2026.
  *
  * Uncomposed, files kept on disk:
  *   03-what-this-is     cut — removed from the shared page by owner
@@ -11,7 +12,9 @@ import { getHeroVariant } from '@/components/variants/hero-variants'
  *   08-you-stop-applying merged into 09-the-work (its founder statement survives)
  *   09-positioning · 10-applications · 11-outreach · 12-dossier · 13-negotiation
  *                        merged into 09-the-work
+ *   09-the-work          cut — removed from the shared page by owner
  *   15-search-review     no publishable copy; the review policy is undefined
+ *   17-guarantees        cut — removed from the shared page by owner
  *   18-admissions        folded into the now-uncomposed 03-what-this-is
  *   14-division-of-labour · 16-fee · 20-day-seven · 21-apply · 22-footer
  *                        cut — removed from the shared page by owner

@@ -1,13 +1,4 @@
-import {
-  Band,
-  Caption,
-  Faq,
-  Label,
-  OutcomeBadge,
-  Section,
-  SectionHeader,
-  Stack,
-} from '@/components/ui'
+import { Faq, Section, SectionHeader, Stack } from '@/components/ui'
 import type { FaqItem } from '@/components/ui'
 
 /**
@@ -113,35 +104,6 @@ const ITEMS: FaqItem[] = [
   },
 ]
 
-/**
- * Build scaffolding, not page copy. The three questions the deck asks and cannot
- * answer. Each is a question a reader will genuinely arrive with, so the debt is
- * recorded on the page rather than only in the deck. Delete this block when the
- * three are answered and fold the questions into ITEMS in deck order.
- */
-const OWED: { id: string; term: string; text: string }[] = [
-  {
-    id: 'success-fee-events',
-    term: 'Offers already in flight',
-    text: 'Whether a fee is owed on an offer arising from an application sent before signature. The deck calls it the question most likely to decide the sale, and obligation seven requires reporting any offer from any source. Owner and counsel.',
-  },
-  {
-    id: 'employer-visibility',
-    term: 'What an employer can see',
-    text: 'Discretion and the Signal Layer controls for an employed client. A separate question from whether the search fits around a job, because the service publishes on the client’s own profile several times a week. Owner and delivery.',
-  },
-  {
-    id: 'supported-profiles',
-    term: 'Roles supported',
-    text: 'Supported role families, the languages worked in, and which pivots are accepted. Three or more years of experience is a threshold, not a fit definition. Owner.',
-  },
-  {
-    id: 'application-approval',
-    term: 'Who decides which jobs I go for',
-    text: 'Whether the client approves each application. Pulled 9 September 2026; restore it whole. Owner and delivery.',
-  },
-]
-
 export function FaqSection() {
   return (
     <Section id="faq" width="text">
@@ -150,35 +112,6 @@ export function FaqSection() {
 
         {/* Definition list at w-narrow — the primitive applies the width itself. */}
         <Faq items={ITEMS} />
-
-        <Band width="narrow">
-          <div
-            data-blocked="faq-questions-without-confirmed-answers"
-            className="flex flex-col gap-flow-m rounded border border-dashed border-muted p-card-m md:gap-flow md:p-card"
-          >
-            {/* Wrapped so the badge keeps its own width in a stretch-aligned column. */}
-            <div className="flex">
-              <OutcomeBadge stage="unverified">Four answers missing</OutcomeBadge>
-            </div>
-
-            <Caption>
-              Four questions have no confirmed policy behind them, so they are off the page.
-            </Caption>
-
-            <dl className="flex flex-col gap-flow-m md:gap-flow">
-              {OWED.map((item) => (
-                <div key={item.id} className="flex flex-col gap-tight">
-                  <Label as="dt">{item.term}</Label>
-                  <dd className="text-s text-muted">{item.text}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <Caption>
-              Two further answers ship incomplete. Details in this file&rsquo;s header comment.
-            </Caption>
-          </div>
-        </Band>
       </Stack>
     </Section>
   )

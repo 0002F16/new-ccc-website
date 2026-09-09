@@ -1,8 +1,6 @@
 import { TwoSituations } from '@/components/sections/02-two-situations'
 import { ThreeBottlenecks } from '@/components/sections/04-three-bottlenecks'
 import { Outcomes } from '@/components/sections/07-outcomes'
-import { TheWork } from '@/components/sections/09-the-work'
-import { Guarantees } from '@/components/sections/17-guarantees'
 import { FaqSection } from '@/components/sections/19-faq'
 import { MovementRule } from '@/components/ui'
 import type { HeroVariant } from './hero-variants'
@@ -22,11 +20,6 @@ export function LandingPage({ variant }: { variant: HeroVariant }) {
 
         <MovementRule />
 
-        <TheWork />
-
-        <MovementRule />
-
-        <Guarantees />
         <FaqSection />
       </main>
     </>
