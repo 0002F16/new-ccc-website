@@ -37,12 +37,13 @@ export function Display({
   children,
 }: {
   as?: 'h1' | 'h2' | 'p'
-  size?: 'xl' | 'l' | 'h2'
+  size?: 'xl' | 'compact' | 'l' | 'h2'
   className?: string
   children: React.ReactNode
 }) {
   const sizes = {
     xl: 'text-display-xl-m md:text-display-xl',
+    compact: 'text-display-l-m md:text-display-xl',
     l: 'text-display-l-m md:text-display-l',
     h2: 'text-h2-m md:text-h2',
   }
