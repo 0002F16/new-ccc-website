@@ -1,0 +1,669 @@
+<title>Seven Directions for CCC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&family=Familjen+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&family=Inter+Tight:wght@400;500;600&family=Karla:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=Schibsted+Grotesk:wght@400;500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+
+<style>
+/* ============================================================
+   CHROME — the board around the specimens.
+   Deliberately single-look: it frames seven fixed palettes, so a
+   theme-reactive chrome would fight whichever specimen it sits above.
+   Every colour is painted explicitly.
+   ============================================================ */
+:root{
+  --chr-bg:#0E1014;
+  --chr-panel:#171A20;
+  --chr-line:#262B34;
+  --chr-fg:#E7E9EE;
+  --chr-mute:#8A93A3;
+  --chr-accent:#7DD3C0;
+  --chr-font:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --chr-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--chr-bg);color:var(--chr-fg);font-family:var(--chr-font);
+  -webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--chr-accent);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.board{max-width:1180px;margin:0 auto;padding:48px 24px 24px}
+.board h1{font-family:var(--chr-font);font-size:clamp(28px,4vw,40px);font-weight:600;
+  letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.board .sub{color:var(--chr-mute);max-width:64ch;margin:0 0 6px;font-size:15.5px}
+.board .sub strong{color:var(--chr-fg);font-weight:600}
+
+.jump{position:sticky;top:0;z-index:50;background:rgba(14,16,20,.93);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--chr-line);margin-top:28px}
+.jump-in{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;gap:8px;
+  flex-wrap:wrap;align-items:center}
+.jump-lab{font-family:var(--chr-mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--chr-mute);margin-right:4px}
+.jump a{font-size:13px;text-decoration:none;color:var(--chr-fg);border:1px solid var(--chr-line);
+  border-radius:999px;padding:5px 12px;white-space:nowrap;transition:border-color .15s,color .15s}
+.jump a:hover{border-color:var(--chr-accent);color:var(--chr-accent)}
+.jump a i{font-style:normal;font-family:var(--chr-mono);color:var(--chr-mute);margin-right:6px}
+
+.variant{border-top:1px solid var(--chr-line);scroll-margin-top:56px}
+.meta{max-width:1180px;margin:0 auto;padding:34px 24px 22px;display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px 40px;align-items:start}
+@media (max-width:820px){.meta{grid-template-columns:1fr}}
+.meta-num{font-family:var(--chr-mono);font-size:12px;letter-spacing:.14em;color:var(--chr-accent);
+  text-transform:uppercase;margin:0 0 8px}
+.meta h2{font-size:26px;font-weight:600;letter-spacing:-.015em;margin:0 0 10px}
+.meta p{margin:0 0 10px;color:var(--chr-mute);font-size:14.5px;max-width:56ch}
+.meta p strong{color:var(--chr-fg);font-weight:500}
+.spec{border:1px solid var(--chr-line);border-radius:10px;background:var(--chr-panel);
+  padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:7px 16px;
+  font-size:12.5px;align-items:baseline}
+.spec dt{font-family:var(--chr-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--chr-mute);white-space:nowrap}
+.spec dd{margin:0;font-family:var(--chr-mono);font-size:12px;color:var(--chr-fg);
+  overflow-wrap:anywhere}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;
+  vertical-align:baseline;border:1px solid rgba(255,255,255,.22)}
+
+/* ============================================================
+   SPECIMEN — one markup, seven systems. Every declaration below
+   reads a token; the [data-v] blocks supply them.
+   ============================================================ */
+.stage{background:var(--ground);color:var(--body-c);font-family:var(--body-f);
+  padding:var(--pad-y) 24px;border-top:var(--stage-top,none)}
+.wrap{max-width:var(--container);margin:0 auto;text-align:var(--align,left);
+  display:flex;flex-direction:column;gap:var(--flow)}
+.eyebrow{font-family:var(--eyebrow-f,var(--body-f));font-size:var(--eyebrow-size,12px);
+  font-weight:var(--eyebrow-w,600);letter-spacing:var(--eyebrow-ls,.14em);
+  text-transform:var(--eyebrow-tt,uppercase);color:var(--eyebrow-c,var(--accent));margin:0;
+  padding:var(--eyebrow-pad,0);background:var(--eyebrow-bg,transparent);
+  border-radius:var(--eyebrow-r,0);align-self:var(--eyebrow-self,flex-start);
+  border:var(--eyebrow-bd,none)}
+.display{font-family:var(--display-f);font-size:var(--h1);line-height:var(--h1-lh,1.05);
+  font-weight:var(--h1-w,700);letter-spacing:var(--h1-ls,-.025em);color:var(--ink);
+  margin:0;text-wrap:balance;max-width:var(--h1-measure,20ch)}
+.display em{font-style:normal;color:var(--accent);
+  background:var(--h1-mark,transparent);box-decoration-break:clone;
+  padding:var(--h1-mark-pad,0)}
+.lede{font-size:var(--lede,18px);line-height:1.55;margin:0;max-width:60ch;color:var(--body-c);
+  align-self:var(--center-self,auto)}
+.lede b{font-weight:600;color:var(--ink)}
+
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;
+  justify-content:var(--just,flex-start)}
+.btn{display:inline-block;background:var(--accent);color:var(--on-accent);
+  font-family:var(--btn-f,var(--body-f));font-size:var(--btn-size,16px);
+  font-weight:var(--btn-w,700);letter-spacing:var(--btn-ls,0);
+  text-transform:var(--btn-tt,none);padding:var(--btn-pad,18px 34px);
+  border-radius:var(--btn-r,8px);text-decoration:none;border:var(--btn-bd,none);
+  transition:transform .16s ease,filter .16s ease;cursor:pointer}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.cta-note{font-size:13.5px;color:var(--mute);max-width:38ch;line-height:1.45}
+
+.vsl{position:relative;aspect-ratio:16/9;background:var(--panel);
+  border-radius:var(--radius);border:var(--panel-bd,1px solid var(--line));
+  display:grid;place-items:center;overflow:hidden;
+  box-shadow:var(--panel-shadow,none)}
+.vsl::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(120% 90% at 50% 0%,var(--vsl-wash,transparent),transparent 70%)}
+.play{position:relative;z-index:1;width:64px;height:64px;border-radius:50%;
+  background:var(--accent);color:var(--on-accent);display:grid;place-items:center;
+  font-size:19px;padding-left:4px}
+.vsl-cap{font-size:13.5px;color:var(--mute);margin:0;align-self:var(--center-self,auto);
+  max-width:52ch}
+
+.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--chip-gap,10px);
+  justify-content:var(--just,flex-start)}
+.chips li{font-size:var(--chip-size,13.5px);font-family:var(--chip-f,var(--body-f));
+  font-weight:var(--chip-w,500);color:var(--chip-c,var(--ink));
+  background:var(--chip-bg,transparent);border:var(--chip-bd,1px solid var(--line));
+  border-radius:var(--chip-r,999px);padding:var(--chip-pad,8px 15px);
+  letter-spacing:var(--chip-ls,0);text-transform:var(--chip-tt,none)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--card-gap,18px)}
+.card{background:var(--panel);border:var(--card-bd,1px solid var(--line));
+  border-radius:var(--radius);padding:var(--card-pad,24px);text-align:left;
+  display:flex;flex-direction:column;gap:9px}
+.card h3{font-family:var(--display-f);font-size:var(--card-h,21px);font-weight:var(--card-h-w,700);
+  letter-spacing:var(--card-h-ls,-.01em);color:var(--ink);margin:0;line-height:1.2}
+.card p{margin:0;font-size:15px;line-height:1.55;color:var(--body-c)}
+
+.case{background:var(--case-bg,var(--panel));border:var(--card-bd,1px solid var(--line));
+  border-left:var(--case-rail,none);border-radius:var(--radius);
+  padding:var(--card-pad,24px);text-align:left;display:flex;flex-direction:column;gap:14px}
+.case-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.tag{font-family:var(--chr-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  font-weight:500;padding:4px 9px;border-radius:3px;background:var(--tag-bg,rgba(128,128,128,.16));
+  color:var(--tag-c,var(--mute));border:1px solid var(--line)}
+.case dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14.5px}
+@media (max-width:560px){.case dl{grid-template-columns:1fr;gap:3px 0}
+  .case dd{margin-bottom:9px}}
+.case dt{font-family:var(--label-f,var(--body-f));font-size:var(--label-size,11px);
+  letter-spacing:var(--label-ls,.11em);text-transform:uppercase;font-weight:600;
+  color:var(--mute);white-space:nowrap;padding-top:3px}
+.case dd{margin:0;color:var(--body-c);line-height:1.5}
+.case dd b{color:var(--ink);font-weight:600}
+.outcome{font-family:var(--display-f);font-size:var(--outcome,22px);line-height:1.25;
+  color:var(--ink);font-weight:var(--h1-w,700);letter-spacing:-.015em;margin:0}
+.outcome span{color:var(--accent)}
+
+.rule{height:1px;background:var(--line);border:0;margin:0;display:var(--rule-d,none)}
+
+/* ---------- 1 · NIGHT DESK ------------------------------------ */
+[data-v="1"]{
+  --ground:#0B0D11;--panel:#14171D;--line:#242932;--ink:#F2F4F8;--body-c:#A9B1BF;
+  --mute:#7A8494;--accent:#3B6EF6;--on-accent:#FFFFFF;
+  --display-f:"Schibsted Grotesk",sans-serif;--body-f:"Karla",sans-serif;
+  --h1:clamp(38px,5.2vw,60px);--h1-measure:17ch;--h1-w:800;--h1-ls:-.03em;
+  --lede:18px;--container:1020px;--pad-y:76px;--flow:26px;--radius:16px;
+  --btn-r:14px;--btn-pad:19px 40px;--btn-size:16px;
+  --chip-bg:#14171D;--chip-bd:1px solid #242932;--chip-c:#C6CDD9;
+  --vsl-wash:rgba(59,110,246,.16);--panel-shadow:0 24px 60px -30px rgba(0,0,0,.9);
+  --tag-bg:rgba(59,110,246,.14);--tag-c:#8FB0FF;
+}
+/* ---------- 2 · WARM SIGNAL ----------------------------------- */
+[data-v="2"]{
+  --ground:#FFFDF9;--panel:#F2F7F3;--line:#E4DED4;--ink:#1A1410;--body-c:#4A443F;
+  --mute:#8A817A;--accent:#E4611B;--on-accent:#FFFFFF;
+  --display-f:"Archivo",sans-serif;--body-f:"Public Sans",sans-serif;
+  --h1:clamp(36px,5vw,58px);--h1-measure:18ch;--h1-w:800;--h1-ls:-.028em;--h1-lh:1.08;
+  --lede:18.5px;--container:820px;--pad-y:72px;--flow:24px;--radius:18px;
+  --align:center;--just:center;--center-self:center;--eyebrow-self:center;
+  --btn-r:999px;--btn-pad:20px 44px;--btn-size:17px;
+  --eyebrow-bg:#EAF6D8;--eyebrow-pad:7px 15px;--eyebrow-r:999px;--eyebrow-c:#4C6A1E;
+  --chip-bg:#DFF3EC;--chip-bd:1px solid transparent;--chip-c:#1A1410;--chip-w:600;
+  --card-bd:1px solid #E4DED4;--case-bg:#FFFFFF;
+  --tag-bg:#FDE9DC;--tag-c:#A8410E;
+}
+[data-v="2"] .card:nth-child(2){--panel:#FDF3E8}
+/* ---------- 3 · GILT ------------------------------------------ */
+[data-v="3"]{
+  --ground:#0A0908;--panel:#131110;--line:#2A2521;--ink:#F6F1E8;--body-c:#B0A79A;
+  --mute:#877D71;--accent:#C9A227;--on-accent:#14110B;
+  --display-f:"Instrument Serif",Georgia,serif;--body-f:"Familjen Grotesk",sans-serif;
+  --h1:clamp(42px,6vw,72px);--h1-measure:16ch;--h1-w:400;--h1-ls:-.012em;--h1-lh:1.04;
+  --lede:17.5px;--container:720px;--pad-y:84px;--flow:24px;--radius:6px;
+  --align:center;--just:center;--center-self:center;--eyebrow-self:center;
+  --eyebrow-ls:.26em;--eyebrow-size:11px;--eyebrow-w:500;
+  --btn-r:4px;--btn-pad:18px 40px;--btn-size:14px;--btn-tt:uppercase;--btn-ls:.14em;--btn-w:600;
+  --chip-bd:1px solid #2A2521;--chip-c:#B0A79A;--chip-r:4px;--chip-size:12.5px;
+  --card-h:20px;--card-h-w:400;--outcome:26px;
+  --vsl-wash:rgba(201,162,39,.13);--tag-bg:rgba(201,162,39,.13);--tag-c:#D6B44A;
+}
+/* ---------- 4 · CHANCERY -------------------------------------- */
+[data-v="4"]{
+  --ground:#FFFFFF;--panel:#F6F7F9;--line:#D8DDE4;--ink:#10243F;--body-c:#3F4A59;
+  --mute:#77808D;--accent:#1B4F8A;--on-accent:#FFFFFF;
+  --display-f:"Source Serif 4",Georgia,serif;--body-f:"Libre Franklin",sans-serif;
+  --h1:clamp(36px,4.8vw,54px);--h1-measure:19ch;--h1-w:600;--h1-ls:-.015em;--h1-lh:1.12;
+  --lede:17.5px;--container:900px;--pad-y:70px;--flow:22px;--radius:3px;
+  --btn-r:3px;--btn-pad:16px 30px;--btn-size:15px;--btn-w:600;
+  --eyebrow-ls:.16em;--eyebrow-size:11.5px;--eyebrow-c:#1B4F8A;
+  --chip-r:3px;--chip-bd:1px solid #D8DDE4;--chip-bg:#F6F7F9;--chip-size:13px;
+  --card-h:19px;--card-h-w:600;--outcome:21px;--rule-d:block;
+  --case-bg:#F6F7F9;--case-rail:3px solid #1B4F8A;
+  --tag-bg:#E7EDF5;--tag-c:#1B4F8A;
+}
+/* ---------- 5 · GRID OFFICE ----------------------------------- */
+[data-v="5"]{
+  --ground:#F2F1EE;--panel:#FFFFFF;--line:#111111;--ink:#111111;--body-c:#3A3A38;
+  --mute:#6E6E6A;--accent:#E2341D;--on-accent:#FFFFFF;
+  --display-f:"Archivo Black",sans-serif;--body-f:"Inter Tight",sans-serif;
+  --h1:clamp(38px,5.6vw,66px);--h1-measure:15ch;--h1-w:400;--h1-ls:-.038em;--h1-lh:.98;
+  --lede:17px;--container:1080px;--pad-y:64px;--flow:26px;--radius:0px;
+  --btn-r:0px;--btn-pad:18px 34px;--btn-size:14px;--btn-tt:uppercase;--btn-ls:.09em;--btn-w:400;
+  --btn-f:"Archivo Black",sans-serif;
+  --eyebrow-ls:.2em;--eyebrow-size:11px;--eyebrow-c:#111111;--eyebrow-w:600;
+  --chip-r:0px;--chip-bd:1px solid #111111;--chip-bg:transparent;--chip-size:12px;
+  --chip-tt:uppercase;--chip-ls:.06em;--chip-w:500;--chip-pad:7px 12px;
+  --card-bd:1px solid #111111;--card-h:18px;--card-h-w:400;--card-h-ls:-.02em;
+  --outcome:24px;--rule-d:block;--case-bg:#FFFFFF;
+  --label-ls:.14em;--tag-bg:#111111;--tag-c:#F2F1EE;
+}
+[data-v="5"] .tag{border-color:#111}
+/* ---------- 6 · GREEN ROOM ------------------------------------ */
+[data-v="6"]{
+  --ground:#EDEFEA;--panel:#FBFBF8;--line:#D6DAD0;--ink:#17392B;--body-c:#4C574E;
+  --mute:#7E887C;--accent:#B4653F;--on-accent:#FFFFFF;
+  --display-f:"Fraunces",Georgia,serif;--body-f:"Instrument Sans",sans-serif;
+  --h1:clamp(36px,4.9vw,56px);--h1-measure:18ch;--h1-w:600;--h1-ls:-.018em;--h1-lh:1.1;
+  --lede:18px;--container:880px;--pad-y:76px;--flow:24px;--radius:12px;
+  --btn-r:10px;--btn-pad:18px 34px;--btn-size:16px;--btn-w:600;
+  --eyebrow-c:#17392B;--eyebrow-ls:.15em;--eyebrow-size:11.5px;
+  --chip-bg:#FBFBF8;--chip-bd:1px solid #D6DAD0;--chip-c:#17392B;--chip-r:8px;
+  --card-h:20px;--card-h-w:600;--outcome:23px;
+  --case-bg:#FBFBF8;--case-rail:4px solid #17392B;
+  --tag-bg:#E3EADF;--tag-c:#17392B;
+}
+/* ---------- 7 · BLUEPRINT ------------------------------------- */
+[data-v="7"]{
+  --ground:#F4F7FB;--panel:#FFFFFF;--line:#C9D6E6;--ink:#0D1B2A;--body-c:#3D4C5E;
+  --mute:#6B7C91;--accent:#1D4ED8;--on-accent:#FFFFFF;
+  --display-f:"IBM Plex Sans",sans-serif;--body-f:"IBM Plex Sans",sans-serif;
+  --h1:clamp(34px,4.6vw,52px);--h1-measure:19ch;--h1-w:600;--h1-ls:-.022em;--h1-lh:1.1;
+  --lede:17.5px;--container:1000px;--pad-y:66px;--flow:24px;--radius:4px;
+  --btn-r:4px;--btn-pad:16px 30px;--btn-size:15px;--btn-w:600;
+  --eyebrow-f:"IBM Plex Mono",monospace;--eyebrow-ls:.1em;--eyebrow-size:11.5px;
+  --eyebrow-bd:1px solid #C9D6E6;--eyebrow-pad:6px 11px;--eyebrow-r:4px;
+  --eyebrow-c:#1D4ED8;--eyebrow-bg:#FFFFFF;
+  --chip-f:"IBM Plex Mono",monospace;--chip-size:12px;--chip-r:4px;--chip-bg:#FFFFFF;
+  --chip-bd:1px solid #C9D6E6;--chip-c:#0D1B2A;--chip-w:400;
+  --label-f:"IBM Plex Mono",monospace;--label-size:10.5px;--label-ls:.08em;
+  --card-h:19px;--card-h-w:600;--outcome:21px;--rule-d:block;
+  --tag-bg:#E3ECFA;--tag-c:#1D4ED8;
+}
+[data-v="7"] .card{background:linear-gradient(#FFF,#FFF) padding-box,
+  repeating-linear-gradient(0deg,#EDF2F9 0 1px,transparent 1px 8px) border-box}
+</style>
+
+<div class="board">
+  <h1>Seven directions for the CCC landing page</h1>
+  <p class="sub">Same slice of the page in every one — eyebrow, headline, video, objection chips, the two situations, one case card. <strong>Only the design system changes.</strong> Palette, type pairing, spacing rhythm, button shape, card treatment and label style are each a complete, internally consistent set.</p>
+  <p class="sub">Copy is the real thing from the strategy brief. The case card is a placeholder, marked as such — no verified client goes on a mock. Pick one to develop, or name the parts you want spliced from two.</p>
+</div>
+
+<nav class="jump" aria-label="Jump to a direction">
+  <div class="jump-in">
+    <span class="jump-lab">Directions</span>
+    <a href="#v1"><i>01</i>Night Desk</a>
+    <a href="#v2"><i>02</i>Warm Signal</a>
+    <a href="#v3"><i>03</i>Gilt</a>
+    <a href="#v4"><i>04</i>Chancery</a>
+    <a href="#v5"><i>05</i>Grid Office</a>
+    <a href="#v6"><i>06</i>Green Room</a>
+    <a href="#v7"><i>07</i>Blueprint</a>
+  </div>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section class="variant" id="v1">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 01</p>
+      <h2>Night Desk</h2>
+      <p>The James Smith lineage, stripped of the countdown clock. Near-black ground, one saturated blue doing every job a colour can do, generous 16px radii, and a single grotesk at two weights. <strong>Says: this is a professional operation that works at night while you sleep.</strong></p>
+      <p>Strongest fit if the VSL is the centrepiece — dark grounds make video look intentional rather than pasted on. Risk: dark high-ticket pages are the house style of the coaching funnel, so it inherits that association whether or not you want it.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Schibsted Grotesk 800 · −0.03em</dd>
+      <dt>Body</dt><dd>Karla 400/600</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#0B0D11"></span>#0B0D11 · panel #14171D</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#3B6EF6"></span>#3B6EF6</dd>
+      <dt>Radius</dt><dd>16px · button 14px</dd>
+      <dt>Rhythm</dt><dd>76px section · 1020px container</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="1">
+    <div class="wrap">
+      <p class="eyebrow">Done-for-you job search · Poland · 3+ years' experience</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v1">Apply for a fit call</a>
+        <span class="cta-note">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</span>
+      </div>
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching — we do the work</li>
+        <li>You approve every application</li>
+        <li>Full fee explained before the call</li>
+        <li>3+ years' experience required</li>
+      </ul>
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="variant" id="v2">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 02</p>
+      <h2>Warm Signal</h2>
+      <p>Drawn from the Imperium funnel: white ground, warm grey body text instead of black, one orange for every call to action, and pastel tint blocks giving the page rhythm without introducing new colours. Centred, narrow, pill buttons. <strong>Says: approachable, plain-spoken, nothing hidden.</strong></p>
+      <p>The friendliest of the seven, and the easiest to read for a stressed visitor. Risk: warmth can undersell a 6,000 PLN commitment if the type isn't held tight.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Archivo 800 · −0.028em</dd>
+      <dt>Body</dt><dd>Public Sans 400/600</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#FFFDF9"></span>#FFFDF9 · text #4A443F</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#E4611B"></span>#E4611B · tints #DFF3EC #EAF6D8</dd>
+      <dt>Radius</dt><dd>18px · button 999px</dd>
+      <dt>Rhythm</dt><dd>72px section · 820px centred</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="2">
+    <div class="wrap">
+      <p class="eyebrow">Done-for-you job search · Poland · 3+ years</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v2">Apply for a fit call</a>
+      </div>
+      <p class="vsl-cap">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</p>
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching</li>
+        <li>You approve every application</li>
+        <li>Full fee before the call</li>
+        <li>3+ years' experience</li>
+      </ul>
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="variant" id="v3">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 03</p>
+      <h2>Gilt</h2>
+      <p>The Goh Consulting lineage taken further: warm near-black, a single gold, a large serif set at light weight, and a narrow 720px column that never widens. Letterspaced small-caps eyebrow, square-ish buttons, almost no radius. <strong>Says: this is expensive, and it is for a particular kind of person.</strong></p>
+      <p>The strongest signal of selectivity, which serves your qualification problem directly. Risk: it is the least warm of the seven, and an anxious visitor may read restraint as coldness.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Instrument Serif 400 · 72px</dd>
+      <dt>Body</dt><dd>Familjen Grotesk 400/600</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#0A0908"></span>#0A0908 · panel #131110</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#C9A227"></span>#C9A227</dd>
+      <dt>Radius</dt><dd>6px · button 4px</dd>
+      <dt>Rhythm</dt><dd>84px section · 720px centred</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="3">
+    <div class="wrap">
+      <p class="eyebrow">Experienced professionals in Poland</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your CV, LinkedIn, applications and outreach — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v3">Apply for a fit call</a>
+      </div>
+      <p class="vsl-cap">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</p>
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching</li>
+        <li>You approve every application</li>
+        <li>Full fee before the call</li>
+        <li>3+ years' experience</li>
+      </ul>
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="variant" id="v4">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 04</p>
+      <h2>Chancery</h2>
+      <p>None of your five references; this one comes from the professional-services shelf — law, accountancy, executive search. White ground, navy ink, a text serif for headlines, hairline rules, 3px corners, a rail on the case card. <strong>Says: we are an institution, and our claims are precise.</strong></p>
+      <p>The direction that best matches your claim rules — precise outcome labels look native here rather than like hedging. Risk: it reads conservative, and conservative can read as slow.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Source Serif 4 600</dd>
+      <dt>Body</dt><dd>Libre Franklin 400/600</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#FFFFFF"></span>#FFFFFF · panel #F6F7F9</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#1B4F8A"></span>#1B4F8A · ink #10243F</dd>
+      <dt>Radius</dt><dd>3px</dd>
+      <dt>Rhythm</dt><dd>70px section · 900px container</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="4">
+    <div class="wrap">
+      <p class="eyebrow">Done-for-you job search · Poland · 3+ years' experience</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v4">Apply for a fit call</a>
+        <span class="cta-note">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</span>
+      </div>
+      <hr class="rule">
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching — we do the work</li>
+        <li>You approve every application</li>
+        <li>Full fee explained before the call</li>
+        <li>3+ years' experience required</li>
+      </ul>
+      <hr class="rule">
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="variant" id="v5">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 05</p>
+      <h2>Grid Office</h2>
+      <p>Swiss poster logic. Off-white paper, black rules, one vermilion, zero radius anywhere, and a heavy grotesk set very tight so the headline reads as a built object. Uppercase micro-labels. <strong>Says: someone with taste made this, and nothing here is accidental.</strong></p>
+      <p>The least likely of the seven to be mistaken for a template or for AI output — which was the original brief. Risk: it is the most demanding to extend; every new section has to earn its place on the grid, and sloppy additions show immediately.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Archivo Black · −0.038em · 0.98 lh</dd>
+      <dt>Body</dt><dd>Inter Tight 400/500</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#F2F1EE"></span>#F2F1EE · rules #111111</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#E2341D"></span>#E2341D</dd>
+      <dt>Radius</dt><dd>0px — everywhere</dd>
+      <dt>Rhythm</dt><dd>64px section · 1080px container</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="5">
+    <div class="wrap">
+      <p class="eyebrow">Done-for-you job search / Poland / 3+ years</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v5">Apply for a fit call</a>
+        <span class="cta-note">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</span>
+      </div>
+      <hr class="rule">
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching</li>
+        <li>You approve every application</li>
+        <li>Full fee before the call</li>
+        <li>3+ years' experience</li>
+      </ul>
+      <hr class="rule">
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="variant" id="v6">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 06</p>
+      <h2>Green Room</h2>
+      <p>A calm, human register: soft grey-green paper, deep forest ink, a clay accent, and a soft serif with real optical warmth. Rounded but not bubbly, generous line height, a rail on the case card. <strong>Says: you are talking to people, and this will not be humiliating.</strong></p>
+      <p>Built for the emotional reality in the research — frustration at not being recognised. This is the only direction that leads with reassurance rather than authority. Risk: it is the furthest from a premium price signal, and needs the pricing section to work hard.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>Fraunces 600</dd>
+      <dt>Body</dt><dd>Instrument Sans 400/600</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#EDEFEA"></span>#EDEFEA · ink #17392B</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#B4653F"></span>#B4653F</dd>
+      <dt>Radius</dt><dd>12px · button 10px</dd>
+      <dt>Rhythm</dt><dd>76px section · 880px container</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="6">
+    <div class="wrap">
+      <p class="eyebrow">Done-for-you job search · Poland · 3+ years' experience</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v6">Apply for a fit call</a>
+        <span class="cta-note">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</span>
+      </div>
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>Not coaching — we do the work</li>
+        <li>You approve every application</li>
+        <li>Full fee explained before the call</li>
+        <li>3+ years' experience required</li>
+      </ul>
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="variant" id="v7">
+  <div class="meta">
+    <div>
+      <p class="meta-num">Direction 07</p>
+      <h2>Blueprint</h2>
+      <p>The only direction whose visual idea is the product itself: a system with people operating it. Cool paper ground, monospace for every label and eyebrow, faint ruled card edges, small 4px corners, one working blue. <strong>Says: there is a documented process here, and you can see it.</strong></p>
+      <p>Answers the objection the research pack flags hardest — visitors not understanding what a done-for-you team actually does. Labels in mono make the process sections legible at a glance. Risk: mono can read as a developer tool rather than a career service.</p>
+    </div>
+    <dl class="spec">
+      <dt>Display</dt><dd>IBM Plex Sans 600</dd>
+      <dt>Labels</dt><dd>IBM Plex Mono 400/500</dd>
+      <dt>Ground</dt><dd><span class="sw" style="background:#F4F7FB"></span>#F4F7FB · ink #0D1B2A</dd>
+      <dt>Accent</dt><dd><span class="sw" style="background:#1D4ED8"></span>#1D4ED8</dd>
+      <dt>Radius</dt><dd>4px</dd>
+      <dt>Rhythm</dt><dd>66px section · 1000px container</dd>
+    </dl>
+  </div>
+  <div class="stage" data-v="7">
+    <div class="wrap">
+      <p class="eyebrow">DFY_JOB_SEARCH · POLAND · 3+ YRS</p>
+      <h3 class="display">You have the experience. Your job search should <em>reflect it</em>.</h3>
+      <p class="lede">A job-search team for expats and immigrants in Poland who are struggling to get interviews, or ready to move beyond an underpaid role. We handle your <b>CV, LinkedIn, applications and outreach</b> — and support you through interviews and negotiation.</p>
+      <div class="cta-row">
+        <a class="btn" href="#v7">Apply for a fit call</a>
+        <span class="cta-note">Tell us about your experience, target role and current search. We'll assess whether the programme fits.</span>
+      </div>
+      <hr class="rule">
+      <div class="vsl"><span class="play">▶</span></div>
+      <p class="vsl-cap">Watch this first — what the service actually is, who it's for, and what it costs.</p>
+      <ul class="chips">
+        <li>not_coaching</li>
+        <li>you_approve_every_application</li>
+        <li>full_fee_before_the_call</li>
+        <li>3+_years_experience</li>
+      </ul>
+      <hr class="rule">
+      <div class="cards">
+        <div class="card"><h3>You're applying and hearing nothing</h3><p>Months of applications, a profile you thought was strong, and almost no invitations back. The problem is usually targeting and presentation, not your ability.</p></div>
+        <div class="card"><h3>You're employed, underpaid and stuck</h3><p>The role stopped growing a while ago. You need the next move to build on the experience you already have — without a second shift spent searching.</p></div>
+      </div>
+      <div class="case">
+        <div class="case-top">
+          <p class="outcome">Three first-round <span>interviews</span> in six weeks</p>
+          <span class="tag">Example · pending verification</span>
+        </div>
+        <dl>
+          <dt>Starting point</dt><dd>Operations specialist, six years' experience, relocated to Kraków.</dd>
+          <dt>Obstacle</dt><dd>Eight months of applications, <b>no interview invitations</b>.</dd>
+          <dt>Work done</dt><dd>Repositioned CV and LinkedIn to operations-management titles; 40 targeted applications; direct outreach to 12 hiring managers.</dd>
+          <dt>Outcome</dt><dd>Three first-round interviews. <b>Interviews, not an offer</b> — labelled precisely.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="board" style="padding-top:36px;padding-bottom:56px;border-top:1px solid var(--chr-line)">
+  <p class="sub"><strong>What happens next.</strong> Name one direction and I'll write it up as a full design system — a complete token set, a type scale, spacing rules, and the component patterns for every section in the page sequence — into CLAUDE.md, then build the primitives before any section work starts. Splicing is fine: “Chancery's discipline with Warm Signal's ground” is a usable instruction.</p>
+</div>
