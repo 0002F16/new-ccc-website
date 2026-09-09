@@ -3,118 +3,103 @@ import {
   Caption,
   Display,
   Eyebrow,
+  Label,
   Lede,
   OutcomeBadge,
+  ProofWall,
   Reveal,
   Section,
   Stack,
   VideoEmbed,
 } from '@/components/ui'
+import { WALL } from './proof-shots'
 
 /**
- * 7. Interviews, offers and job starts — Movement II, the case slot.
+ * 7. Proof — Movement II. Three registers, one argument.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * REBUILT 9 SEPTEMBER 2026 — Round 2. Two changes, both on owner instruction.
+ * REBUILT 9 SEPTEMBER 2026 — Round 3. Owner's brief: make the testimonials work,
+ * three-pronged — cases, videos, screenshots — and the priority is that it looks
+ * like volume: a lot of people have got somewhere.
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * 1. THE NINE VIDEOS NOW PLAY INLINE. They were outbound `<a>` links to
- *    youtube.com; a reader who clicked one left the page and did not come back.
- *    They are now `VideoEmbed` — poster plus a play control, swapped in place for
- *    a youtube-nocookie iframe on click. Nothing is requested from YouTube until
- *    the reader asks, so the page still sets no third-party cookie on arrival.
+ * What it was: nine YouTube tiles two-across, inside a dashed `data-blocked`
+ * container whose badge read "Nine videos, none verified". The section that has
+ * to say *this works for people* opened by saying it could not prove anything.
+ * Round 2 was right that the debt is real and wrong about where to record it —
+ * a build note does not belong in the reader's eyeline. The debt now lives here
+ * and in CLAUDE.md's OPEN list, which is where the people who can close it look.
  *
- * 2. THE SIX PLACEHOLDER CASE CARDS (P01–P06) ARE CUT. Rationale below, under
- *    "What was removed and why", together with everything they used to render so
- *    that no verification debt is lost by deleting them.
+ * ── The three registers, in reading order ───────────────────────────────────
  *
- * Word budget. This section rendered roughly 950 words of build scaffolding
- * around roughly 70 words of reader-facing copy — the worst ratio on the page.
- * Round 2 caps a scaffolding caption at fifteen words and moves the explanation
- * here, where the build team actually reads it. Rendered scaffolding is now the
- * badge, one caption and the employer-name note: under thirty words in total.
+ * 1. SCREENSHOTS — the wall, at full bleed. Thirty-nine community posts across
+ *    the viewport less the page gutter, two to five columns by breakpoint,
+ *    12px channels. This is the volume device and it is now the section's
+ *    opening image.
  *
- * ── What was removed and why ────────────────────────────────────────────────
+ *    HISTORY, because this reverses a decision made an hour earlier. Round 3
+ *    put three captures above the wall on `WorkProductPlate`s at ~990px — one
+ *    per rung of the outcome ladder — on the argument that at wall scale a
+ *    screenshot is texture and texture alone is decoration claiming to be
+ *    evidence. The owner cut that tier on 9 September 2026: the collection
+ *    alone, spanning the page.
  *
- * A placeholder register of the six public case candidates P01–P06 from the
- * research pack occupied this slot as six `CaseCard`s on the ladder's
- * `unverified` rung. Every card carried the same four findings in different
- * words — starting situation not recorded, obstacle not recorded, work done
- * cannot be written, milestone claimed but not established — and every card
- * repeated the identical 67-word "work done" paragraph. That is roughly 800 of
- * the section's 950 scaffolding words spent restating one fact six times.
+ *    The full-bleed width is what makes that workable rather than merely
+ *    smaller. Inside `w-structure` a tile was 240px at every size above `lg`;
+ *    at bleed it is 244px at 1280 and 371px at 1920, so tiles grow with the
+ *    screen instead of multiplying. A post headline is legible on a wide
+ *    display where it was not before. It is not a plate at 990px and the
+ *    trade is real — recorded here and in `proof-shots.ts` rather than argued
+ *    again. The three former specimens were not dropped; they are folded into
+ *    the wall at positions 2, 14 and 27.
  *
- * They are cut rather than compressed, on the judgement that nine videos a
- * reader can actually play are stronger evidence than six cards that say
- * nothing, and that a wall of dashed empty cards immediately above a dashed
- * block of real videos reads as one undifferentiated apology. Note that the
- * cards never carried a `data-blocked` attribute, so a `data-blocked` grep is
- * not weakened by their removal — nothing was greppable there to lose. The debt
- * itself stays live in CLAUDE.md's OPEN list under "Case verification (P01–P06)"
- * and is restated here so it survives in the file:
+ *    This is also why the section is `width="bleed"`: the wall gets the whole
+ *    measure and registers 2 and 3 band themselves back to `structure`. The
+ *    page's rhythm — prose narrows, structure widens — gains a third and widest
+ *    tier, used exactly once.
  *
- *   P01  ING → US Bank, portfolio risk management. Published as a signed offer.
- *        An offer is not a job someone started; neither is established.
- *   P02  Alcon, data science. Two published records conflict — the offer item
- *        says Associate, the interview item says Senior Associate.
- *   P03  Oanda, senior cash management. Interview invitation only. Seniority in
- *        a role title does not establish years of experience.
- *   P04  Smith & Nephew, senior master data management. Interview invitation
- *        only. Evidence of a specialist opportunity, not of a placement.
- *   P05  Cantor Fitzgerald, AVP. Interview invitation only.
- *   P06  Linklaters. Two published records conflict — the results wall says
- *        business development, the homepage says data analyst.
+ * 2. VIDEOS. The same nine, now three-across at `lg` — a 3×3 block reads as
+ *    "nine" at a glance where five rows of two read as a list. This reverses
+ *    round 2's two-across rule, which was set on the grounds that a 16:9 embed
+ *    at ~310px collapses the YouTube control bar. Three across inside
+ *    `w-structure` is ~330px, above that threshold, and the tiles are facades
+ *    until clicked, so nothing but a poster image is laid out at rest.
  *
- * For all six: consent, service actually received (DFY or coaching), relevant
- * experience, starting situation, specific work performed, an absolute date and
- * the exact milestone are open. "Work done" is mandatory on a shipped
- * `CaseCard` and must be specific — what was repositioned, how many
- * applications, how much outreach. The programme's confirmed weekly volumes (ten
- * or more tailored applications, thirty to seventy direct approaches) are
- * publishable and belong in that field, but no record links either figure to any
- * of these six, so neither may be written into a card until the file for that
- * case shows it. When a verified case arrives it comes back as a `CaseCard`
- * above the video block; the anatomy is unchanged and nothing here blocks it.
+ * 3. CASES. Six rows, not six `CaseCard`s. `CaseCard` makes "Work done"
+ *    mandatory and specific and no work-done fact is recorded for any of
+ *    P01–P06, which is exactly why its six instances were deleted on 9
+ *    September. The ledger states what the results page publishes and stops.
  *
- * ── The video block ─────────────────────────────────────────────────────────
+ * ── Gold budget ─────────────────────────────────────────────────────────────
  *
- * Playing inline does not verify anything, so the block keeps the ladder's
- * `unverified` treatment: dashed `muted` edge, no fill, and a badge naming what
- * is missing in words. Per docs/assets/2026-09-08-video-inventory.md, all seven
- * required facts are open for every one of the nine — most importantly consent
- * to reuse on this page (consent to be filmed for the old site is not that),
- * which service was received, and one exact milestone. Two strap-lines aggregate
- * outcomes ("4 Tier-1 Offers", "Multi-Offers"), which the claim rules require to
- * be relabelled to a single milestone or dropped. Seven of the nine are graduate
- * or survival-job stories, which is the framing this page exists to replace —
- * filming four to five matched experienced cases remains a launch blocker.
+ * Zero `line-gold` elements. The eyebrow ships `hairline={false}`, the videos
+ * use `control="quiet"` (nine gold discs would be nine accents), and no ledger
+ * row takes the `start` rung because no job start is established for any of the
+ * six. The section's only accent is the eyebrow, which every section has.
  *
- * Titles and strap-lines are the LIVE SITE'S OWN wording, carried across
- * unaltered. Nothing in this block is written here, which is what keeps a block
- * of unverified material from also being unverified copy.
+ * The one gold element it used to carry — the `start` rung on the third
+ * specimen, the only confirmed job start shown — went with the specimen tier.
  *
- * ── System notes ────────────────────────────────────────────────────────────
+ * ── What is still open ──────────────────────────────────────────────────────
  *
- * Accent budget. Nine gold play controls would spend the section's accent nine
- * times over, so the tiles use `VideoEmbed control="quiet"` — a 44px outlined
- * disc. The 64px gold disc is for a single video at structural width, never a
- * grid. The eyebrow also ships `hairline={false}` and the header is composed
- * from `Eyebrow`/`Display`/`Lede` rather than `SectionHeader`, which has no
- * hairline prop, so this section renders zero gold elements.
+ * Consent per person, service actually received (DFY or coaching), and absolute
+ * dates — for all thirty-nine screenshots and all nine videos. Note that with
+ * the specimen tier gone, no outcome on the wall is labelled by rung any more:
+ * interviews, offers and job starts sit side by side at the same weight, and
+ * only the posts' own words distinguish them. A community post
+ * does not evidence done-for-you delivery, and consent to be filmed for the old
+ * site is not consent to appear here. Shipping this material now was the
+ * owner's decision, taken on 9 September 2026 with the position stated. The
+ * curation that was applied regardless is documented in `proof-shots.ts`.
  *
- * Grid. Two across at desktop, not three. At `max-w-structure` less the blocked
- * slot's padding, three across puts a 16:9 embed at roughly 310px wide — the
- * YouTube control bar collapses and a talking head is unreadable. Two across
- * gives roughly 480px, which is watchable. One column below 640px.
- *
- * Framing: execution only. Nothing here says CCC placed, presented or
- * represented anyone, or that CCC arranged an interview.
+ * For the six cases: P02's title conflicts across two published records
+ * (Associate vs Senior Associate) and P06's does too (business development vs
+ * data analyst), so neither row states a title. Four of the nine video
+ * strap-lines carry employer names; the note under the block is what keeps them
+ * from reading as partnerships.
  */
 
-/**
- * The nine testimonial videos already published on capitalcareerclub.com/en.
- * `title` and `strap` are the live site's own wording — see the note above.
- */
+/** The nine testimonial videos already published on capitalcareerclub.com/en. */
 type Video = { id: string; title: string; strap: string }
 
 const VIDEOS: readonly Video[] = [
@@ -165,61 +150,114 @@ const VIDEOS: readonly Video[] = [
   },
 ]
 
+/**
+ * The six public case candidates from the results page. Employer locator and
+ * milestone only — the research pack records nothing else for any of them, and
+ * inventing a "work done" line is the one thing the case anatomy forbids.
+ */
+type Case = { id: string; locator: string; stage: 'interview' | 'offer'; milestone: string }
+
+const CASES: readonly Case[] = [
+  { id: 'P01', locator: 'ING → US Bank · Portfolio risk management', stage: 'offer', milestone: 'Signed offer' },
+  { id: 'P02', locator: 'Alcon · Data science', stage: 'offer', milestone: 'Signed offer' },
+  { id: 'P03', locator: 'Oanda · Senior cash management', stage: 'interview', milestone: 'Interview' },
+  { id: 'P04', locator: 'Smith & Nephew · Senior master data management', stage: 'interview', milestone: 'Interview' },
+  { id: 'P05', locator: 'Cantor Fitzgerald · AVP', stage: 'interview', milestone: 'Interview' },
+  { id: 'P06', locator: 'Linklaters', stage: 'offer', milestone: 'Signed offer' },
+]
+
+/**
+ * Register label. The three prongs are one section, so they are separated by a
+ * named rule rather than by a heading — a second and third `h2` here would claim
+ * three arguments where there is one.
+ */
+function Register({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-tight border-b border-line pb-tight">
+      <Label>{children}</Label>
+    </div>
+  )
+}
+
 export function Outcomes() {
   return (
-    <Section id="outcomes">
+    <Section id="outcomes" width="bleed">
       <Stack gap="block">
         <Reveal>
           <Band width="text" className="flex flex-col gap-tight text-center">
             <Eyebrow hairline={false}>What happened for other people</Eyebrow>
             <Display as="h2" size="h2">
-              Nine people, in their own words
+              The results speak for themselves
             </Display>
             <div className="pt-flow-m md:pt-flow">
               <Lede>
-                Filmed for our current site, describing their own search. Play any of them here.
+                Posts from the client community, nine filmed conversations, and the cases published
+                on our results page.
               </Lede>
             </div>
           </Band>
         </Reveal>
 
-        {/*
-          Blocked slot. Deleted in full, or replaced video by video, once the
-          seven facts in the video inventory are established for each one. The
-          long-form reason lives in the file comment above, not on the page.
-        */}
-        <Reveal delay={0.04}>
-          <div
-            data-blocked="testimonial-videos-unverified"
-            className="flex flex-col gap-flow-m rounded border border-dashed border-muted p-card-m md:gap-flow md:p-card"
-          >
-            <div className="flex">
-              <OutcomeBadge stage="unverified">Nine videos, none verified</OutcomeBadge>
-            </div>
+        {/* Register 1 — the wall, at the section's full bleed width. */}
+        <Stack gap="flow">
+          <Reveal>
+            <Register>From the client community</Register>
+          </Reveal>
 
-            <Caption>
-              Consent to reuse, service received and exact milestone are open on all nine.
-            </Caption>
+          <Reveal delay={0.04}>
+            <ProofWall shots={WALL} />
+          </Reveal>
+        </Stack>
 
-            <ul className="grid grid-cols-1 gap-flow-m sm:grid-cols-2 md:gap-flow">
-              {VIDEOS.map((v) => (
-                <li key={v.id} className="flex flex-col gap-tight">
-                  <VideoEmbed id={v.id} title={v.title} control="quiet" />
-                  <span className="text-s text-ink">{v.title}</span>
-                  <span className="text-caption text-muted">{v.strap}</span>
+        {/* Register 2 — the nine videos, 3×3, banded back to structure. */}
+        <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
+          <Reveal>
+            <Register>In their own words</Register>
+          </Reveal>
+
+          <Reveal delay={0.04}>
+            <ul className="grid grid-cols-1 gap-flow-m sm:grid-cols-2 md:gap-flow lg:grid-cols-3">
+              {VIDEOS.map((video) => (
+                <li key={video.id} className="flex flex-col gap-tight">
+                  <VideoEmbed id={video.id} title={video.title} control="quiet" />
+                  <span className="text-s text-ink">{video.title}</span>
+                  <span className="text-caption text-muted">{video.strap}</span>
                 </li>
               ))}
             </ul>
-          </div>
-        </Reveal>
+          </Reveal>
+        </Band>
 
-        <Reveal delay={0.08}>
-          <Band width="text">
-            <Caption>
-              Employer names locate a public example. They do not indicate a partnership.
-            </Caption>
-          </Band>
-        </Reveal>
+        {/* Register 3 — the published cases, banded back to structure. */}
+        <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
+          <Reveal>
+            <Register>Published cases</Register>
+          </Reveal>
+
+          <Reveal delay={0.04}>
+            <ul className="grid grid-cols-1 md:grid-cols-2 md:gap-x-block">
+              {CASES.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex flex-col gap-tight border-t border-line-soft py-flow-m md:py-flow"
+                >
+                  <span className="text-s text-ink">{entry.locator}</span>
+                  <div className="flex">
+                    <OutcomeBadge stage={entry.stage}>{entry.milestone}</OutcomeBadge>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <Band width="text">
+              <Caption>
+                Employer names locate a public example. They do not indicate a partnership.
+              </Caption>
+            </Band>
+          </Reveal>
+        </Band>
       </Stack>
     </Section>
   )

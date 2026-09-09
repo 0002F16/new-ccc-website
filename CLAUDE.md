@@ -345,6 +345,7 @@ silently breaks.
 | `w-structure` | 1040px | Cards, the seven stages, the price block, case grids, the video frame. |
 | `w-text` | 720px | All prose, centred. |
 | `w-narrow` | 520px | Form column, FAQ. |
+| `bleed` | none | Viewport less 2×`gutter`. The proof wall only. Never prose. |
 
 **The alternation between 720px centred prose and 1040px structural bands is the
 page's rhythm.** It is what stops a long dark page from reading as one
@@ -537,6 +538,57 @@ block; 8px rise over 240ms, once, on entering the viewport. `delay` staggers a
 group at 40ms steps.
 **Never** wrap something whose absence would break the page if motion fails, and
 never use it to sequence content a reader is waiting on.
+
+### Proof wall
+Added 9 September 2026, for the three-pronged proof section. The volume device:
+many client screenshots at once, so the page can show that a lot of people got
+somewhere without stating a number the claim rules forbid.
+
+**Why it is not the work-product plate.** The plate presents *one* artefact for
+reading. The wall presents *many* for scanning.
+
+**It runs at `bleed` width, and that is load-bearing.** Amended 9 September 2026,
+same day, after the owner cut the legible specimen tier that had preceded it. The
+original rule here required two to three specimens on `WorkProductPlate`s above
+every wall, because at 240px a screenshot is texture and texture alone is
+decoration claiming to be evidence. That rule is withdrawn on one condition: the
+wall must span the viewport, so tiles grow with the screen — 244px at 1280,
+371px at 1920 — instead of staying at the 240px they had inside `w-structure`.
+A wall confined to `w-structure` with no specimen tier is still forbidden. Size
+is the whole compensation.
+
+Anatomy: CSS multi-column masonry, `columns-2 md:columns-3 lg:columns-4
+xl:columns-5`, each tile `break-inside-avoid`, the artefact unaltered inside
+`surface`, `1px line`, `4px` radius and `space-tight` of dark padding — a plate
+at wall scale. `next/image` with intrinsic width and height from the file, lazy
+below the fold. One `label` naming the register; no per-tile caption.
+
+Past `xl` the column count stops rising. Tiles get bigger, not more numerous —
+the opposite of the usual responsive instinct, and the reason the wall stays
+readable on a large display.
+
+**Reported deviation, deliberate:** CSS columns cannot take `gap`, so tiles carry
+a bottom margin. This is the one place in the system where a margin sets rhythm
+between siblings.
+
+**Never** crop a post to fit a uniform tile — the crop removes the sentence that
+is the evidence. **Never** tint, overlay, duotone or recolour a tile. **Never** a
+fixed aspect ratio: the corpus runs from 10.87:1 to 0.73:1. **Never** randomise
+the order or the selection — hand-authored constant, or it is a fabrication.
+**Never** a fade-out mask at the foot of the wall to imply more: that is a
+gradient, and the count of what is shown is the honest version of the same idea.
+
+### Case ledger
+Added 9 September 2026. A compact list of published cases — employer locator and
+role in `ink`, an outcome badge per row, rows divided by `line-soft`, two columns
+of three at `md`.
+
+It exists because `CaseCard` cannot be honestly instantiated: that component makes
+"Work done" mandatory and specific, and no work-done fact is recorded for any of
+P01–P06. The ledger states only what the results page publishes — who, what role,
+which milestone — and stops there. When a case is verified it graduates to a
+`CaseCard` above the ledger; the ledger is the holding pattern, not a replacement.
+**Never** give a ledger row the `start` rung until a job start is established.
 
 ## Overridden 9 September 2026
 

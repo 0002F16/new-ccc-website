@@ -1,8 +1,15 @@
 import { cx } from './cx'
 
-type Width = 'page' | 'structure' | 'text' | 'narrow'
+type Width = 'bleed' | 'page' | 'structure' | 'text' | 'narrow'
 
 const widths: Record<Width, string> = {
+  /**
+   * Full-bleed: the section keeps its gutter and drops the max-width, so content
+   * runs the viewport less 2×`gutter`. Deliberately not `100vw` — that measure
+   * includes the scrollbar and would put the page into horizontal overflow.
+   * A `bleed` section must band its own prose: nothing reads at 1900px.
+   */
+  bleed: 'max-w-none',
   page: 'max-w-page',
   structure: 'max-w-structure',
   text: 'max-w-text',
