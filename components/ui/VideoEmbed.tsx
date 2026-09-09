@@ -20,19 +20,30 @@ import { cx } from './cx'
  *
  * `alt=""` on the poster is correct ONLY because every use sites the title as
  * adjacent live text. Keep it that way.
+ *
+ * `poster` is a quality choice, not a style one:
+ *   hq  — 480×360, and YouTube letterboxes 16:9 into it. Fine for a grid tile,
+ *         where `object-cover` crops the bars off and nothing is upscaled.
+ *   max — 1280×720, true 16:9. Required for a featured video at `w-structure`,
+ *         where hq would be upscaled more than twice and look it. Costs ~200KB,
+ *         so never use it for a grid: nine of them is 1.8MB of poster.
+ * `maxresdefault` is absent for some uploads, so it falls back to hq on error.
  */
 export function VideoEmbed({
   id,
   title,
   control = 'accent',
+  poster = 'hq',
   className,
 }: {
   id: string
   title: string
   control?: 'accent' | 'quiet'
+  poster?: 'hq' | 'max'
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
+  const [posterQuality, setPosterQuality] = useState(poster)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   // Activating a tile otherwise drops focus to <body>, so the next Tab restarts
@@ -68,9 +79,10 @@ export function VideoEmbed({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+            src={`https://i.ytimg.com/vi/${id}/${posterQuality === 'max' ? 'maxresdefault' : 'hqdefault'}.jpg`}
             alt=""
             loading="lazy"
+            onError={() => setPosterQuality('hq')}
             className="absolute inset-0 h-full w-full object-cover"
           />
           <span className="absolute inset-0 flex items-center justify-center">

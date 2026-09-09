@@ -3,6 +3,7 @@ import {
   Caption,
   Display,
   Eyebrow,
+  H3,
   Label,
   Lede,
   OutcomeBadge,
@@ -58,12 +59,19 @@ import { WALL } from './proof-shots'
  *    page's rhythm — prose narrows, structure widens — gains a third and widest
  *    tier, used exactly once.
  *
- * 2. VIDEOS. The same nine, now three-across at `lg` — a 3×3 block reads as
- *    "nine" at a glance where five rows of two read as a list. This reverses
- *    round 2's two-across rule, which was set on the grounds that a 16:9 embed
- *    at ~310px collapses the YouTube control bar. Three across inside
- *    `w-structure` is ~330px, above that threshold, and the tiles are facades
- *    until clicked, so nothing but a poster image is laid out at rest.
+ * 2. VIDEOS. One featured film at the full band width, then the same nine
+ *    three-across at `lg` — a 3×3 block reads as "nine" at a glance where five
+ *    rows of two read as a list. That reverses round 2's two-across rule, which
+ *    was set on the grounds that a 16:9 embed at ~310px collapses the YouTube
+ *    control bar. Three across inside `w-structure` is ~330px, above that
+ *    threshold, and the tiles are facades until clicked, so nothing but a poster
+ *    image is laid out at rest.
+ *
+ *    The featured film is the section's only `control="accent"` — a 64px gold
+ *    disc, which the component permits for one video and forbids in a grid. It
+ *    also takes `poster="max"`: at ~1040px the 480×360 `hqdefault` the tiles use
+ *    would be upscaled more than twice and letterboxed. See `FEATURE` below for
+ *    why its displayed title is not its YouTube title.
  *
  * 3. CASES. Six rows, not six `CaseCard`s. `CaseCard` makes "Work done"
  *    mandatory and specific and no work-done fact is recorded for any of
@@ -83,7 +91,8 @@ import { WALL } from './proof-shots'
  * ── What is still open ──────────────────────────────────────────────────────
  *
  * Consent per person, service actually received (DFY or coaching), and absolute
- * dates — for all thirty-nine screenshots and all nine videos. Note that with
+ * dates — for all thirty-nine screenshots and all ten videos, the featured film
+ * included. Note that with
  * the specimen tier gone, no outcome on the wall is labelled by rung any more:
  * interviews, offers and job starts sit side by side at the same weight, and
  * only the posts' own words distinguish them. A community post
@@ -98,6 +107,41 @@ import { WALL } from './proof-shots'
  * strap-lines carry employer names; the note under the block is what keeps them
  * from reading as partnerships.
  */
+
+/**
+ * The featured film. Added 10 September 2026 on the owner's instruction — one
+ * video, ahead of the nine and much larger.
+ *
+ * It earns the position: it is the only long-form piece on the page, the founder
+ * is in it, and the subject is an employed international in Poland moving between
+ * two named employers — which is the ICP the strategy brief describes and which
+ * seven of the nine below are not. Uploaded 5 September 2026, so it is also the
+ * newest thing here by a year.
+ *
+ * TITLE IS NOT THE YOUTUBE TITLE, and this is a claim-rule decision rather than
+ * an editorial one. The video is published as "Why Good Expats Make Bad Money in
+ * Poland (And How She Tripled Her Pay in 30 Days" — a salary-increase claim and a
+ * thirty-day timeline, both on the non-negotiable list, and neither covered by the
+ * 9 September override, which reaches the hero stat row and nothing else. Setting
+ * that string as page copy would publish both claims in the largest type in the
+ * section. What is used instead is the first clause of the real title, verbatim
+ * and unaltered, which carries no claim. The video is linked as it is; the page
+ * does not repeat what the page may not say.
+ *
+ * The thumbnail was checked for the same reason and is clean — two people, two
+ * employer marks, "your job search done for you". No figure, no timeline.
+ *
+ * Starts at 0:00. The owner's link carried `t=1023s`, which is almost certainly
+ * where they happened to be watching; opening a stranger seventeen minutes into a
+ * thirty-two-minute film is not a highlight. One prop to change if it was meant.
+ */
+const FEATURE = {
+  id: '8NZYSVMTdF4',
+  title: 'Why good expats make bad money in Poland',
+  description:
+    'Aziz Khaitov sits down with a client who moved from Secret Escapes to HireVue — what her search looked like before, what changed in it, and how the offer came together.',
+  runtime: '32 minutes',
+} as const
 
 /** The nine testimonial videos already published on capitalcareerclub.com/en. */
 type Video = { id: string; title: string; strap: string }
@@ -216,6 +260,22 @@ export function Outcomes() {
           </Reveal>
 
           <Reveal delay={0.04}>
+            <figure className="flex flex-col gap-flow-m md:gap-flow">
+              <VideoEmbed
+                id={FEATURE.id}
+                title={FEATURE.title}
+                control="accent"
+                poster="max"
+              />
+              <figcaption className="mx-auto flex max-w-text flex-col gap-tight text-center">
+                <H3>{FEATURE.title}</H3>
+                <p className="text-base text-body [text-wrap:pretty]">{FEATURE.description}</p>
+                <Caption>{FEATURE.runtime}</Caption>
+              </figcaption>
+            </figure>
+          </Reveal>
+
+          <Reveal delay={0.08}>
             <ul className="grid grid-cols-1 gap-flow-m sm:grid-cols-2 md:gap-flow lg:grid-cols-3">
               {VIDEOS.map((video) => (
                 <li key={video.id} className="flex flex-col gap-tight">
