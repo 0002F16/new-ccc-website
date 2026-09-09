@@ -22,8 +22,9 @@ All hero content and review statuses live in:
 
 Useful prompts:
 
+- “Edit the `working` hero. Keep its proof-first layout and tighten the lede.”
 - “Edit the `second-shift` hero. Make the lede shorter without changing the headline.”
-- “Show `/variants?v=no-interviews` and tighten the mobile hero.”
+- “Show `/variants?v=working` and tighten the mobile hero.”
 - “Mark `value-first` approved and `career-progression` in review.”
 - “Create a new headline option from `hours-and-access`, keeping its layout and qualifiers.”
 
@@ -35,13 +36,16 @@ that layout should change. The remainder of the landing page is composed once in
 
 | ID | Route | Purpose |
 |---|---|---|
-| `baseline` | `/` | Original homepage baseline |
+| `baseline` | `/variants/original-baseline` | Original homepage baseline |
 | `value-first` | `/value-first` | Existing value-first version |
-| `no-interviews` | `/variants/no-interviews` | Active-search pain |
+| `working` | `/` | Current proof-first working homepage |
 | `career-progression` | `/variants/career-progression` | Employed and stalled |
 | `second-shift` | `/variants/second-shift` | Time and workload |
 | `interview-conversion` | `/variants/interview-conversion` | Interviews without offers |
 | `hours-and-access` | `/variants/hours-and-access` | Founder value proposition |
+
+The former no-interviews direction remains available at `/variants/no-interviews`, but it is archived
+from the studio. Old `/variants?v=no-interviews` bookmarks redirect to the working version.
 
 ## Local version history
 

@@ -17,8 +17,8 @@ import {
 import type { HeroVariant } from './hero-variants'
 
 const stats: Stat[] = [
-  { figure: '180+', label: 'Internationals placed in Poland' },
-  { figure: '15M+ PLN', label: 'Earned by clients annually' },
+  { figure: '200+', label: 'Internationals placed in Poland' },
+  { figure: '20M+ PLN', label: 'Earned by clients annually' },
   { figure: '1,000+', label: 'Job interviews landed in Poland' },
   { figure: '40–60 days', label: 'Average time to dream job offer' },
 ]
@@ -239,6 +239,12 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
         <Reveal delay={0.24}>
           <CtaBlock note={variant.ctaNote} />
         </Reveal>
+
+        {variant.showStats !== false && (
+          <Reveal delay={0.28} className="w-full">
+            <HeroStats />
+          </Reveal>
+        )}
       </Stack>
     </Section>
   )

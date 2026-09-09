@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { VariantStudio } from '@/components/variants/VariantStudio'
 import { getHeroVariant, type HeroVariantId } from '@/components/variants/hero-variants'
 
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 
 export default function VariantsPage({ searchParams }: { searchParams: { v?: string } }) {
   const requested = searchParams.v
+  if (requested === 'no-interviews') redirect('/variants?v=working')
+
   const initialVariantId = (requested && getHeroVariant(requested) ? requested : 'value-first') as HeroVariantId
 
   return <VariantStudio initialVariantId={initialVariantId} />

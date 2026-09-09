@@ -14,5 +14,5 @@ import { getHeroVariant } from '@/components/variants/hero-variants'
  *   18-admissions        folded into 03-what-this-is
  */
 export default function Page() {
-  return <LandingPage variant={getHeroVariant('baseline')!} />
+  return <LandingPage variant={getHeroVariant('working')!} />
 }

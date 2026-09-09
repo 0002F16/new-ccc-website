@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { LandingPage } from '@/components/variants/LandingPage'
-import { experimentVariants, getHeroVariant } from '@/components/variants/hero-variants'
+import { getRoutedHeroVariant, routedHeroVariants } from '@/components/variants/hero-variants'
 
 export function generateStaticParams() {
-  return experimentVariants.map((variant) => ({ slug: variant.id }))
+  return routedHeroVariants.map((variant) => ({ slug: variant.path.split('/').pop()! }))
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const variant = getHeroVariant(params.slug)
-  if (!variant || variant.path !== `/variants/${params.slug}`) return {}
+  const variant = getRoutedHeroVariant(params.slug)
+  if (!variant) return {}
 
   return {
     title: `${variant.name} hero | Capital Career Club`,
@@ -19,8 +19,8 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 }
 
 export default function VariantPage({ params }: { params: { slug: string } }) {
-  const variant = getHeroVariant(params.slug)
-  if (!variant || variant.path !== `/variants/${params.slug}`) notFound()
+  const variant = getRoutedHeroVariant(params.slug)
+  if (!variant) notFound()
 
   return <LandingPage variant={variant} />
 }

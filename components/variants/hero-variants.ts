@@ -51,7 +51,7 @@ export const heroVariants = [
   {
     id: 'baseline',
     name: 'Original baseline',
-    path: '/',
+    path: '/variants/original-baseline',
     hypothesis: 'Recognition of existing experience establishes relevance before explaining the service.',
     status: 'baseline',
     layout: 'baseline',
@@ -90,18 +90,18 @@ export const heroVariants = [
     stickyLine: 'A serious search campaign for experienced internationals in Poland.',
   },
   {
-    id: 'no-interviews',
-    name: 'No interviews',
-    path: '/variants/no-interviews',
-    hypothesis: 'The most common observed pain creates immediate recognition for active job seekers.',
+    id: 'working',
+    name: 'Working version',
+    path: '/',
+    hypothesis: 'Proof, a clear service promise and immediate video create the strongest complete homepage opening.',
     status: 'in-review',
     layout: 'social-proof-video',
     eyebrow: 'The step-by-step job-search campaign',
-    headline: ['Applying in Poland,', 'but still not getting interviews?'],
-    accentPhrase: 'interviews?',
+    headline: ['You have the experience.', 'We turn it into your next role.'],
+    accentPhrase: 'your next role.',
     headlineSize: 'compact',
     lede:
-      'You have a professional track record. We help the right employers see it through sharper positioning, targeted applications, direct outreach and interview preparation.',
+      'The only end-to-end career engineering system built for internationals in Poland. We rebuild your CV and LinkedIn, run the applications and outreach every week, and get you ready for every interview.',
     showVideo: true,
     preloadVideo: true,
     socialProof: {
@@ -110,8 +110,8 @@ export const heroVariants = [
     },
     bridgeLine: 'Let us show you how.',
     videoCaption: 'See how the search campaign works.',
-    showStats: false,
-    stickyLine: 'Turn strong experience into a search employers can recognise.',
+    showStats: true,
+    stickyLine: 'Turn your experience into your next role.',
   },
   {
     id: 'career-progression',
@@ -189,10 +189,42 @@ export const heroVariants = [
 
 export type HeroVariantId = (typeof heroVariants)[number]['id']
 
-export const experimentVariants = heroVariants.filter(
-  (variant) => variant.id !== 'baseline' && variant.id !== 'value-first',
-)
+const archivedHeroVariants = [
+  {
+    id: 'no-interviews-archive',
+    name: 'No interviews (archive)',
+    path: '/variants/no-interviews',
+    hypothesis: 'The most common observed pain creates immediate recognition for active job seekers.',
+    status: 'in-review',
+    layout: 'social-proof-video',
+    eyebrow: 'The step-by-step job-search campaign',
+    headline: ['Applying in Poland,', 'but still not getting interviews?'],
+    accentPhrase: 'interviews?',
+    headlineSize: 'compact',
+    lede:
+      'You have a professional track record. We help the right employers see it through sharper positioning, targeted applications, direct outreach and interview preparation.',
+    showVideo: true,
+    preloadVideo: true,
+    socialProof: {
+      figure: '200+',
+      label: 'clients have worked with Capital Career Club',
+    },
+    bridgeLine: 'Let us show you how.',
+    videoCaption: 'See how the search campaign works.',
+    showStats: false,
+    stickyLine: 'Turn strong experience into a search employers can recognise.',
+  },
+] as const satisfies readonly HeroVariant[]
+
+export const routedHeroVariants: readonly HeroVariant[] = [
+  ...heroVariants.filter((variant) => variant.path.startsWith('/variants/')),
+  ...archivedHeroVariants,
+]
 
 export function getHeroVariant(id: string): HeroVariant | undefined {
   return heroVariants.find((variant) => variant.id === id)
+}
+
+export function getRoutedHeroVariant(slug: string): HeroVariant | undefined {
+  return routedHeroVariants.find((variant) => variant.path === `/variants/${slug}`)
 }
