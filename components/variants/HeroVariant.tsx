@@ -25,6 +25,29 @@ const stats: Stat[] = [
 
 const LOOM_ID = 'ee574d181bb7444e84884afa81a9bc58'
 
+function ClientPhotoPlaceholders() {
+  return (
+    <span aria-hidden className="flex shrink-0 items-center">
+      {[0, 1, 2, 3, 4].map((item) => (
+        <span
+          key={item}
+          className={`flex h-[28px] w-[28px] items-center justify-center rounded-[14px] border border-line bg-sunken text-muted ${item === 0 ? '' : '-ml-[8px]'}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="7" r="3" stroke="currentColor" strokeWidth="1.5" />
+            <path
+              d="M4.5 17c.5-3.2 2.3-4.8 5.5-4.8s5 1.6 5.5 4.8"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      ))}
+    </span>
+  )
+}
+
 function Highlight({ line, phrase }: { line: string; phrase: string }) {
   const start = line.indexOf(phrase)
   if (start === -1) return line
@@ -122,6 +145,7 @@ function VideoFirstHero({ variant }: { variant: HeroVariant }) {
               <LoomEmbed
                 id={LOOM_ID}
                 title="How Capital Career Club runs an end-to-end job-search campaign"
+                eager={variant.preloadVideo}
               />
               {variant.videoCaption && (
                 <p className="text-center text-caption text-muted">{variant.videoCaption}</p>
@@ -165,12 +189,14 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
       <Stack gap="flow" className="items-center">
         {variant.socialProof && (
           <Reveal>
-            <div className="flex min-h-[56px] items-center gap-flow-m rounded border border-line bg-surface px-card-m py-[12px] shadow-card md:gap-flow md:px-card">
-              <span className="tnum font-serif text-h3-m text-ink md:text-h3">
-                {variant.socialProof.figure}
+            <div className="flex min-h-[44px] max-w-narrow items-center gap-tight rounded border border-line bg-surface px-[16px] py-[8px] shadow-card">
+              <ClientPhotoPlaceholders />
+              <span className="text-caption text-body">
+                <span className="tnum font-serif text-h4 text-ink">
+                  {variant.socialProof.figure}
+                </span>{' '}
+                {variant.socialProof.label}
               </span>
-              <span aria-hidden className="h-[28px] w-px bg-line" />
-              <span className="text-s text-body">{variant.socialProof.label}</span>
             </div>
           </Reveal>
         )}
@@ -201,7 +227,7 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
               <LoomEmbed
                 id={LOOM_ID}
                 title="How Capital Career Club runs an end-to-end job-search campaign"
-                eager
+                eager={variant.preloadVideo}
               />
               {variant.videoCaption && (
                 <p className="text-center text-caption text-muted">{variant.videoCaption}</p>

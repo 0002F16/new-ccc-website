@@ -32,6 +32,7 @@ export type HeroVariant = {
   chips?: readonly HeroChip[]
   qualifiers?: readonly HeroQualifier[]
   showVideo: boolean
+  preloadVideo?: boolean
   videoCaption?: string
   socialProof?: HeroSocialProof
   bridgeLine?: string
@@ -84,6 +85,7 @@ export const heroVariants = [
       'We turn your track record into a focused job-search campaign—stronger positioning, consistent access to the right employers, and sharper performance when interviews arrive.',
     qualifiers: defaultQualifiers,
     showVideo: true,
+    preloadVideo: true,
     videoCaption: 'Watch the overview here.',
     stickyLine: 'A serious search campaign for experienced internationals in Poland.',
   },
@@ -101,6 +103,7 @@ export const heroVariants = [
     lede:
       'You have a professional track record. We help the right employers see it through sharper positioning, targeted applications, direct outreach and interview preparation.',
     showVideo: true,
+    preloadVideo: true,
     socialProof: {
       figure: '200+',
       label: 'clients have worked with Capital Career Club',
