@@ -74,7 +74,14 @@ hours and short of access. Those are the only two things I sell."
 - `motion` (Motion for React), added 9 September 2026. Permitted for exactly two
   things: the hero load stagger, and one scroll reveal per section via `Reveal`.
   Nothing else — no parallax, no layout animation, no counters.
-- Deploy target: OPEN (Vercel vs the existing VPS at 76.13.177.250)
+- Deploy target: **Vercel**, decided 10 September 2026. Resolved against the
+  existing VPS at 76.13.177.250, which hosts unrelated apps (fyxor.eu, the CV
+  Tailor API) behind nginx and pm2 — nothing on this page needs to sit beside
+  them, and Next.js on Vercel is zero-config. Source of truth is the GitHub
+  repo `0002F16/new-ccc-website`; `main` is production and every push
+  redeploys. No environment variables are required — the page has no API keys,
+  no database and no server-side integrations yet. That changes the moment the
+  application form or Calendly is wired in, which is still OPEN.
 - Component library: none exists. Primitives get built from the design system
   before section work starts.
 
@@ -867,7 +874,8 @@ sentence for the KRAZ question while that question is open.
 - Whether a Polish-language version is needed.
 - Page location (path or subdomain), the application form or booking tool, and
   UTM/analytics so the funnel in the strategy brief can actually be measured.
-- Deploy target: Vercel or the existing VPS.
+- ~~Deploy target~~ — decided 10 September 2026: Vercel, deploying from `main`
+  of `0002F16/new-ccc-website`. See Stack.
 
 ## Current phase
 
