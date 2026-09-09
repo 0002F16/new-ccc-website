@@ -149,8 +149,69 @@ function VideoFirstHero({ variant }: { variant: HeroVariant }) {
           </Reveal>
         </Stack>
 
-        <Reveal delay={0.24} className="w-full">
-          <HeroStats />
+        {variant.showStats !== false && (
+          <Reveal delay={0.24} className="w-full">
+            <HeroStats />
+          </Reveal>
+        )}
+      </Stack>
+    </Section>
+  )
+}
+
+function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
+  return (
+    <Section id="hero" width="page" className="!py-block-m md:!py-block">
+      <Stack gap="flow" className="items-center">
+        {variant.socialProof && (
+          <Reveal>
+            <div className="flex min-h-[56px] items-center gap-flow-m rounded border border-line bg-surface px-card-m py-[12px] shadow-card md:gap-flow md:px-card">
+              <span className="tnum font-serif text-h3-m text-ink md:text-h3">
+                {variant.socialProof.figure}
+              </span>
+              <span aria-hidden className="h-[28px] w-px bg-line" />
+              <span className="text-s text-body">{variant.socialProof.label}</span>
+            </div>
+          </Reveal>
+        )}
+
+        <Stack gap="flow" className="mx-auto w-full max-w-structure items-center text-center">
+          <Reveal delay={0.04}>
+            <Eyebrow hairline={false}>{variant.eyebrow}</Eyebrow>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <Headline variant={variant} />
+          </Reveal>
+
+          <Reveal delay={0.12} className="max-w-text">
+            <Lede>{variant.lede}</Lede>
+          </Reveal>
+
+          {variant.bridgeLine && (
+            <Reveal delay={0.16}>
+              <p className="text-s text-ink">{variant.bridgeLine}</p>
+            </Reveal>
+          )}
+        </Stack>
+
+        {variant.showVideo && (
+          <Reveal delay={0.2} className="mx-auto w-full max-w-structure">
+            <div className="flex flex-col gap-tight">
+              <LoomEmbed
+                id={LOOM_ID}
+                title="How Capital Career Club runs an end-to-end job-search campaign"
+                eager
+              />
+              {variant.videoCaption && (
+                <p className="text-center text-caption text-muted">{variant.videoCaption}</p>
+              )}
+            </div>
+          </Reveal>
+        )}
+
+        <Reveal delay={0.24}>
+          <CtaBlock note={variant.ctaNote} />
         </Reveal>
       </Stack>
     </Section>
@@ -158,9 +219,7 @@ function VideoFirstHero({ variant }: { variant: HeroVariant }) {
 }
 
 export function HeroVariantView({ variant }: { variant: HeroVariant }) {
-  return variant.layout === 'baseline' ? (
-    <BaselineHero variant={variant} />
-  ) : (
-    <VideoFirstHero variant={variant} />
-  )
+  if (variant.layout === 'baseline') return <BaselineHero variant={variant} />
+  if (variant.layout === 'social-proof-video') return <SocialProofVideoHero variant={variant} />
+  return <VideoFirstHero variant={variant} />
 }

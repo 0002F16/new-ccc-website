@@ -1,5 +1,5 @@
 export type HeroVariantStatus = 'baseline' | 'in-review' | 'draft' | 'approved'
-export type HeroVariantLayout = 'baseline' | 'video-first'
+export type HeroVariantLayout = 'baseline' | 'video-first' | 'social-proof-video'
 export type HeroHeadlineSize = 'xl' | 'compact'
 
 export type HeroQualifier = {
@@ -10,6 +10,11 @@ export type HeroQualifier = {
 export type HeroChip = {
   label: string
   href: string
+}
+
+export type HeroSocialProof = {
+  figure: string
+  label: string
 }
 
 export type HeroVariant = {
@@ -28,6 +33,9 @@ export type HeroVariant = {
   qualifiers?: readonly HeroQualifier[]
   showVideo: boolean
   videoCaption?: string
+  socialProof?: HeroSocialProof
+  bridgeLine?: string
+  showStats?: boolean
   ctaNote?: string
   stickyLine: string
 }
@@ -84,17 +92,22 @@ export const heroVariants = [
     name: 'No interviews',
     path: '/variants/no-interviews',
     hypothesis: 'The most common observed pain creates immediate recognition for active job seekers.',
-    status: 'draft',
-    layout: 'video-first',
-    eyebrow: 'For experienced internationals in Poland',
+    status: 'in-review',
+    layout: 'social-proof-video',
+    eyebrow: 'The step-by-step job-search campaign',
     headline: ['Applying in Poland,', 'but still not getting interviews?'],
     accentPhrase: 'interviews?',
     headlineSize: 'compact',
     lede:
-      'You have a professional track record. We help the right employers see it through sharper positioning, targeted applications, direct outreach, and preparation for every conversation.',
-    qualifiers: defaultQualifiers,
+      'You have a professional track record. We help the right employers see it through sharper positioning, targeted applications, direct outreach and interview preparation.',
     showVideo: true,
+    socialProof: {
+      figure: '200+',
+      label: 'clients have worked with Capital Career Club',
+    },
+    bridgeLine: 'Let us show you how.',
     videoCaption: 'See how the search campaign works.',
+    showStats: false,
     stickyLine: 'Turn strong experience into a search employers can recognise.',
   },
   {

@@ -10,10 +10,12 @@ import { cx } from './cx'
 export function LoomEmbed({
   id,
   title,
+  eager = false,
   className,
 }: {
   id: string
   title: string
+  eager?: boolean
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
@@ -25,9 +27,9 @@ export function LoomEmbed({
         className,
       )}
     >
-      {playing ? (
+      {playing || eager ? (
         <iframe
-          src={`https://www.loom.com/embed/${id}?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&autoplay=1`}
+          src={`https://www.loom.com/embed/${id}?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&autoplay=${playing ? '1' : '0'}`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
