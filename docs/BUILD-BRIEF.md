@@ -24,7 +24,7 @@ default; add `'use client'` only where interaction genuinely requires it.
 `H4` `Lede` `Body` `Caption` `Label` `SectionHeader` · `Button` `CtaBlock`
 `CTA_LABEL` · `ChipRow` · `Card` `Well` · `SpecList` `Op` · `OutcomeBadge` ·
 `CaseCard` · `ProcessStep` · `Faq` · `Testimonial` · `VideoFrame` ·
-`WorkProductPlate` · `Field` · `StickyCta` · `cx`
+`WorkProductPlate` · `LogoCarousel` · `Field` · `StickyCta` · `cx`
 
 **Do not invent a component.** If a section appears to need one, stop and report
 it rather than adding it — new components go into `CLAUDE.md` first, with
@@ -141,8 +141,9 @@ New primitives available:
 
 - `StatRow` — `{ stats: Stat[] }`, `Stat = { figure, label }`. Hero only.
 - `VideoEmbed` — `{ id, title }`. Click-to-play YouTube facade, plays inline.
-- `Reveal` — `{ delay?, className? }`. The page's only motion device: 8px rise,
-  240ms, once, reduced-motion safe. Wrap a block, do not wrap every element.
+- `Reveal` — `{ delay?, className? }`. The page's only content-entry motion: 8px
+  rise, 240ms, once, reduced-motion safe. Interactive state feedback and the
+  documented bottleneck SVG hover response remain CSS-only.
 
 The CTA label changed to **"Yes — I'm ready to apply"**. It lives in `CTA_LABEL`
 (`components/ui/Button.tsx`) — never hardcode a label.

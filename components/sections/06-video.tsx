@@ -102,7 +102,10 @@ export function VideoSection() {
           </figcaption>
         </figure>
 
-        <CtaBlock note="Thirty minutes on a call, and we tell you whether we would take this on." />
+        <CtaBlock
+          analyticsId="video-section"
+          note="Thirty minutes on a call, and we tell you whether we would take this on."
+        />
       </Stack>
     </Section>
   )

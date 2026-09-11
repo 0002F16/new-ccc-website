@@ -1,0 +1,7 @@
+# Aggregation and retention at 02:20 Europe/Warsaw server time.
+20 2 * * * ccc-web /bin/bash -lc 'set -a; source /etc/ccc-website.env; set +a; cd /srv/ccc-website/current; /usr/bin/npm run analytics:maintain' >> /var/log/ccc-analytics-maintenance.log 2>&1
+# Daily and weekly PostgreSQL backups.
+40 2 * * * ccc-web /srv/ccc-website/current/infra/scripts/backup-analytics.sh daily
+50 2 * * 0 ccc-web /srv/ccc-website/current/infra/scripts/backup-analytics.sh weekly
+# Refresh the local country/subdivision database; no visitor address is sent.
+15 3 * * 1 root /usr/bin/geoipupdate >> /var/log/ccc-geoip-update.log 2>&1

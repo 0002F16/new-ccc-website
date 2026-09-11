@@ -188,7 +188,7 @@ export function Apply() {
             neither navigates nor submits.
           */}
           <div className="flex flex-col items-center gap-flow-m text-center md:gap-flow">
-            <Button href="#apply" />
+            <Button analyticsId="application-placeholder" href="#apply" />
             <Caption>Four questions, then you pick a time.</Caption>
           </div>
 

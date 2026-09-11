@@ -90,11 +90,19 @@ const FIGURE = 'h-auto w-2/3 md:w-full'
 function VolumeFigure() {
   const sent = new Set([0, 1, 2, 3, 6, 10])
   return (
-    <svg viewBox={FRAME} aria-hidden focusable="false" className={FIGURE}>
+    <svg viewBox={FRAME} aria-hidden focusable="false" className={`${FIGURE} diagnostic-volume`}>
       {Array.from({ length: 12 }, (_, i) => {
         const x = 14 + i * 20
         return sent.has(i) ? (
-          <rect key={i} x={x} y={24} width={12} height={44} className="fill-muted" />
+          <rect
+            key={i}
+            x={x}
+            y={24}
+            width={12}
+            height={44}
+            className="diagnostic-bar fill-muted"
+            style={{ '--diagnostic-index': i } as React.CSSProperties}
+          />
         ) : (
           <rect
             key={i}
@@ -104,7 +112,8 @@ function VolumeFigure() {
             height={42.5}
             strokeWidth={1.5}
             vectorEffect="non-scaling-stroke"
-            className="fill-transparent stroke-muted"
+            className="diagnostic-bar fill-transparent stroke-muted"
+            style={{ '--diagnostic-index': i } as React.CSSProperties}
           />
         )
       })}
@@ -123,7 +132,8 @@ function VolumeFigure() {
         strokeLinecap="round"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
-        className="fill-transparent stroke-accent"
+        pathLength="1"
+        className="diagnostic-volume-bracket fill-transparent stroke-accent"
       />
     </svg>
   )
@@ -142,7 +152,7 @@ function ReachFigure() {
   const rows = [196, 224, 168, 210, 182, 232, 160, 204, 188, 218, 226, 150, 174, 208, 190, 164]
   const you = 10
   return (
-    <svg viewBox={FRAME} aria-hidden focusable="false" className={FIGURE}>
+    <svg viewBox={FRAME} aria-hidden focusable="false" className={`${FIGURE} diagnostic-reach`}>
       {rows.map((width, i) => {
         const y = 8 + i * 6 + (i < you ? 0 : 4) + (i > you ? 4 : 0)
         const x = i === you ? 10 : 32
@@ -155,7 +165,11 @@ function ReachFigure() {
             y2={y}
             strokeWidth={1.5}
             vectorEffect="non-scaling-stroke"
-            className={i === you ? 'stroke-accent' : 'stroke-muted'}
+            className={
+              i === you
+                ? 'diagnostic-reach-row diagnostic-reach-reader stroke-accent'
+                : 'diagnostic-reach-row stroke-muted'
+            }
           />
         )
       })}
@@ -170,7 +184,7 @@ function ReachFigure() {
 function InterviewFigure() {
   const theirs = [86, 70, 90, 64, 78]
   return (
-    <svg viewBox={FRAME} aria-hidden focusable="false" className={FIGURE}>
+    <svg viewBox={FRAME} aria-hidden focusable="false" className={`${FIGURE} diagnostic-interview`}>
       <path
         d="M42 16 H26 V88 H42"
         strokeWidth={1.5}
@@ -190,7 +204,9 @@ function InterviewFigure() {
             y2={y}
             strokeWidth={1.5}
             vectorEffect="non-scaling-stroke"
-            className="stroke-muted"
+            pathLength="1"
+            className="diagnostic-interview-line stroke-muted"
+            style={{ '--diagnostic-index': i } as React.CSSProperties}
           />
         )
       })}
@@ -200,7 +216,7 @@ function InterviewFigure() {
         strokeLinecap="round"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
-        className="fill-transparent stroke-accent"
+        className="diagnostic-interview-bracket fill-transparent stroke-accent"
       />
     </svg>
   )
@@ -274,7 +290,7 @@ export function ThreeBottlenecks() {
               key={bottleneck.id}
               delay={index * 0.04}
               className={[
-                'flex flex-col gap-flow-m md:grid md:grid-rows-subgrid md:row-span-3',
+                'diagnostic-card flex flex-col gap-flow-m md:grid md:grid-rows-subgrid md:row-span-3',
                 index > 0 && 'border-t border-line pt-flow-m md:border-t-0 md:pt-0',
                 COLUMN[index],
               ]

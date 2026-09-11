@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default function VariantsPage({ searchParams }: { searchParams: { v?: string } }) {
-  const requested = searchParams.v
+export default async function VariantsPage({ searchParams }: { searchParams: Promise<{ v?: string }> }) {
+  const requested = (await searchParams).v
   if (requested === 'no-interviews') redirect('/variants?v=working')
 
   const initialVariantId = (requested && getHeroVariant(requested) ? requested : 'value-first') as HeroVariantId

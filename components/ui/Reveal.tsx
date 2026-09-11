@@ -1,7 +1,7 @@
 import { cx } from './cx'
 
 /**
- * Reveal — the page's only motion device: an 8px rise over 240ms on load.
+ * Reveal — the page's only content-entry motion: an 8px rise over 240ms on load.
  *
  * Deliberately CSS-only, and deliberately not scroll-triggered.
  *

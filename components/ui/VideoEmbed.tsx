@@ -1,7 +1,81 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { cx } from './cx'
+
+type PosterQuality = 'hq' | 'max'
+type Control = 'accent' | 'quiet'
+
+// WebP first — roughly a third smaller than YouTube's JPEG. Each error steps to
+// the next source: maxres is missing on some uploads, WebP on a few old ones.
+function posterSources(id: string, quality: PosterQuality) {
+  const hq = [
+    `https://i.ytimg.com/vi_webp/${id}/hqdefault.webp`,
+    `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+  ]
+  return quality === 'max'
+    ? [`https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`, ...hq]
+    : hq
+}
+
+function VideoPoster({
+  src,
+  control,
+  interactive = false,
+  loading = false,
+  onError,
+}: {
+  src: string
+  control: Control
+  interactive?: boolean
+  loading?: boolean
+  onError: () => void
+}) {
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        onError={onError}
+        className={cx(
+          'absolute inset-0 h-full w-full object-cover transition-transform duration-ui-slow ease-ui',
+          interactive && 'group-hover:scale-[1.015] group-focus-visible:scale-[1.015]',
+        )}
+      />
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span
+          className={cx(
+            'flex items-center justify-center transition duration-ui ease-ui group-active:scale-[.97]',
+            control === 'accent'
+              ? 'h-[64px] w-[64px] rounded-[32px] bg-accent group-hover:-translate-y-px group-hover:bg-accent-hover group-focus-visible:-translate-y-px group-focus-visible:bg-accent-hover'
+              : 'h-[44px] w-[44px] rounded-[22px] border border-line bg-surface/90 group-hover:-translate-y-px group-hover:border-ink group-focus-visible:-translate-y-px group-focus-visible:border-ink',
+          )}
+        >
+          <svg
+            aria-hidden
+            width={control === 'accent' ? 20 : 14}
+            height={control === 'accent' ? 22 : 16}
+            viewBox="0 0 20 22"
+            className={cx(
+              'ml-1 transition-transform duration-ui ease-ui group-hover:translate-x-[2px] group-focus-visible:translate-x-[2px]',
+              control === 'accent' ? 'text-accent-on' : 'text-ink',
+            )}
+          >
+            <path d="M2 2l16 9-16 9V2z" fill="currentColor" />
+          </svg>
+        </span>
+      </span>
+      {loading && (
+        <span className="absolute bottom-tight left-1/2 -translate-x-1/2 rounded-badge bg-surface/90 px-[8px] py-[4px] text-label font-medium uppercase text-ink">
+          Loading video
+        </span>
+      )}
+    </>
+  )
+}
 
 /**
  * VideoEmbed — click-to-play facade for a YouTube video.
@@ -27,7 +101,7 @@ import { cx } from './cx'
  *   max — 1280×720, true 16:9. Required for a featured video at `w-structure`,
  *         where hq would be upscaled more than twice and look it. Costs ~200KB,
  *         so never use it for a grid: nine of them is 1.8MB of poster.
- * `maxresdefault` is absent for some uploads, so it falls back to hq on error.
+ * Both load as WebP; `posterSources` steps down to hq WebP, then hq JPEG, on error.
  */
 export function VideoEmbed({
   id,
@@ -38,20 +112,17 @@ export function VideoEmbed({
 }: {
   id: string
   title: string
-  control?: 'accent' | 'quiet'
-  poster?: 'hq' | 'max'
+  control?: Control
+  poster?: PosterQuality
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
-  const [posterQuality, setPosterQuality] = useState(poster)
+  const [ready, setReady] = useState(false)
+  const sources = posterSources(id, poster)
+  const [posterIndex, setPosterIndex] = useState(0)
+  const posterSrc = sources[posterIndex]
+  const nextPoster = () => setPosterIndex((i) => Math.min(i + 1, sources.length - 1))
   const iframeRef = useRef<HTMLIFrameElement>(null)
-
-  // Activating a tile otherwise drops focus to <body>, so the next Tab restarts
-  // from the top of the page. Cross-origin means we can focus the frame but not
-  // inside it, which is enough to keep tab order sane.
-  useEffect(() => {
-    if (playing) iframeRef.current?.focus()
-  }, [playing])
 
   return (
     <div
@@ -61,50 +132,63 @@ export function VideoEmbed({
       )}
     >
       {playing ? (
-        <iframe
-          ref={iframeRef}
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          className="absolute inset-0 h-full w-full border-0"
-        />
+        <>
+          <iframe
+            ref={iframeRef}
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            onLoad={() => {
+              setReady(true)
+              iframeRef.current?.focus()
+            }}
+            className={cx(
+              'absolute inset-0 h-full w-full border-0 transition-opacity duration-ui-slow ease-ui',
+              ready ? 'opacity-100' : 'opacity-0',
+            )}
+          />
+          <div
+            aria-hidden
+            className={cx(
+              'pointer-events-none absolute inset-0 transition-opacity duration-ui-slow ease-ui',
+              ready ? 'opacity-0' : 'opacity-100',
+            )}
+          >
+            <VideoPoster
+              src={posterSrc}
+              control={control}
+              loading
+              onError={nextPoster}
+            />
+          </div>
+          {!ready && (
+            <span className="sr-only" role="status">
+              Loading video
+            </span>
+          )}
+        </>
       ) : (
         <button
           type="button"
-          onClick={() => setPlaying(true)}
+          data-analytics-event="video_start"
+          data-analytics-id={`video-${id}`}
+          data-analytics-hesitation="true"
+          data-analytics-outcome="media"
+          onClick={() => {
+            setReady(false)
+            setPlaying(true)
+          }}
           aria-label={`Play video: ${title}`}
           className="group absolute inset-0 h-full w-full cursor-pointer"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`https://i.ytimg.com/vi/${id}/${posterQuality === 'max' ? 'maxresdefault' : 'hqdefault'}.jpg`}
-            alt=""
-            loading="lazy"
-            onError={() => setPosterQuality('hq')}
-            className="absolute inset-0 h-full w-full object-cover"
+          <VideoPoster
+            src={posterSrc}
+            control={control}
+            interactive
+            onError={nextPoster}
           />
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span
-              className={cx(
-                'flex items-center justify-center transition duration-ui ease-ui',
-                control === 'accent'
-                  ? 'h-[64px] w-[64px] rounded-[32px] bg-accent group-hover:bg-accent-hover'
-                  : 'h-[44px] w-[44px] rounded-[22px] border border-line bg-surface/90 group-hover:border-ink',
-              )}
-            >
-              <svg
-                aria-hidden
-                width={control === 'accent' ? 20 : 14}
-                height={control === 'accent' ? 22 : 16}
-                viewBox="0 0 20 22"
-                className={cx('ml-1', control === 'accent' ? 'text-accent-on' : 'text-ink')}
-              >
-                <path d="M2 2l16 9-16 9V2z" fill="currentColor" />
-              </svg>
-            </span>
-          </span>
         </button>
       )}
     </div>

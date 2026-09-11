@@ -135,8 +135,15 @@ function SituationTabs() {
           role="tablist"
           aria-label="Two ways people arrive here"
           onKeyDown={onKeyDown}
-          className="grid grid-cols-2 overflow-hidden rounded border border-line"
+          className="relative isolate grid grid-cols-2 overflow-hidden rounded border border-line"
         >
+          <span
+            aria-hidden
+            className={cx(
+              'absolute inset-y-0 left-0 -z-10 w-1/2 bg-accent-wash transition-transform duration-ui ease-ui',
+              selected === 1 && 'translate-x-full',
+            )}
+          />
           {SITUATIONS.map((situation, index) => {
             const active = index === selected
             return (
@@ -155,7 +162,7 @@ function SituationTabs() {
                 className={cx(
                   'min-h-[44px] p-tight text-center text-s transition-colors duration-ui ease-ui',
                   index === 1 && 'border-l border-line',
-                  active ? 'bg-accent-wash text-ink' : 'text-muted hover:text-ink',
+                  active ? 'text-ink' : 'text-muted hover:text-ink focus-visible:text-ink',
                 )}
               >
                 {situation.tabLabel}
@@ -172,6 +179,7 @@ function SituationTabs() {
             aria-labelledby={`${situation.id}-tab`}
             tabIndex={0}
             hidden={index !== selected}
+            className={index === selected ? 'situation-panel-enter' : undefined}
           >
             <SituationBody situation={situation} />
           </div>

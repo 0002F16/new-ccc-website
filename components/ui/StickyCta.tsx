@@ -43,7 +43,7 @@ export function StickyCta({ line, watch = 'hero' }: { line: string; watch?: stri
     >
       <div className="mx-auto flex w-full max-w-page flex-col items-center gap-tight px-gutter-m py-[16px] md:flex-row md:justify-between md:px-gutter">
         <p className="text-s text-body">{line}</p>
-        <Button className="w-full md:w-auto" />
+        <Button analyticsId="sticky" className="w-full md:w-auto" />
       </div>
     </div>
   )

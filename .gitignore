@@ -11,3 +11,6 @@ node_modules
 # Local research assets: keep on disk, not in version history.
 Testimonials Screenshots/
 CCC_Offer_Letter.pdf
+
+# Playwright run output
+test-results/

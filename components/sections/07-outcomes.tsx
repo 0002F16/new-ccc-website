@@ -1,12 +1,9 @@
 import {
   Band,
-  Caption,
   Display,
   Eyebrow,
-  H3,
-  Label,
   Lede,
-  OutcomeBadge,
+  LogoCarousel,
   ProofWall,
   Reveal,
   Section,
@@ -16,12 +13,12 @@ import {
 import { WALL } from './proof-shots'
 
 /**
- * 7. Proof — Movement II. Three registers, one argument.
+ * 7. Proof — Movement II. Two evidence forms, one argument.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * REBUILT 9 SEPTEMBER 2026 — Round 3. Owner's brief: make the testimonials work,
- * three-pronged — cases, videos, screenshots — and the priority is that it looks
- * like volume: a lot of people have got somewhere.
+ * REBUILT 9 SEPTEMBER 2026 — Round 3. The original brief was three-pronged:
+ * cases, videos and screenshots. The published-case ledger was removed on the
+ * owner's instruction on 10 September; screenshots and videos now carry proof.
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * What it was: nine YouTube tiles two-across, inside a dashed `data-blocked`
@@ -31,10 +28,10 @@ import { WALL } from './proof-shots'
  * a build note does not belong in the reader's eyeline. The debt now lives here
  * and in CLAUDE.md's OPEN list, which is where the people who can close it look.
  *
- * ── The three registers, in reading order ───────────────────────────────────
+ * ── The two evidence forms, in reading order ────────────────────────────────
  *
  * 1. SCREENSHOTS — the wall, at full bleed. Thirty-nine community posts across
- *    the viewport less the page gutter, two to five columns by breakpoint,
+ *    the viewport less the page gutter, one to three columns by breakpoint,
  *    12px channels. This is the volume device and it is now the section's
  *    opening image.
  *
@@ -45,14 +42,10 @@ import { WALL } from './proof-shots'
  *    evidence. The owner cut that tier on 9 September 2026: the collection
  *    alone, spanning the page.
  *
- *    The full-bleed width is what makes that workable rather than merely
- *    smaller. Inside `w-structure` a tile was 240px at every size above `lg`;
- *    at bleed it is 244px at 1280 and 371px at 1920, so tiles grow with the
- *    screen instead of multiplying. A post headline is legible on a wide
- *    display where it was not before. It is not a plate at 990px and the
- *    trade is real — recorded here and in `proof-shots.ts` rather than argued
- *    again. The three former specimens were not dropped; they are folded into
- *    the wall at positions 2, 14 and 27.
+ *    Full-bleed width plus the revised one/two/three-column anatomy makes each
+ *    tile materially readable at every breakpoint. Every plate also opens the
+ *    unaltered source at its intrinsic size in the proof viewer. The three
+ *    former specimens remain folded into the wall at positions 2, 14 and 27.
  *
  *    This is also why the section is `width="bleed"`: the wall gets the whole
  *    measure and registers 2 and 3 band themselves back to `structure`. The
@@ -71,19 +64,18 @@ import { WALL } from './proof-shots'
  *    disc, which the component permits for one video and forbids in a grid. It
  *    also takes `poster="max"`: at ~1040px the 480×360 `hqdefault` the tiles use
  *    would be upscaled more than twice and letterboxed. See `FEATURE` below for
- *    why its displayed title is not its YouTube title.
- *
- * 3. CASES. Six rows, not six `CaseCard`s. `CaseCard` makes "Work done"
- *    mandatory and specific and no work-done fact is recorded for any of
- *    P01–P06, which is exactly why its six instances were deleted on 9
- *    September. The ledger states what the results page publishes and stops.
+ *    why its accessible title is not its YouTube title.
  *
  * ── Gold budget ─────────────────────────────────────────────────────────────
  *
  * Zero `line-gold` elements. The eyebrow ships `hairline={false}`, the videos
- * use `control="quiet"` (nine gold discs would be nine accents), and no ledger
- * row takes the `start` rung because no job start is established for any of the
- * six. The section's only accent is the eyebrow, which every section has.
+ * use `control="quiet"` (nine gold discs would be nine accents). The section's
+ * only accent is the eyebrow, which every section has.
+ *
+ * Before the three proof registers, a restrained employer rail locates the
+ * market the reader is navigating. Its accessible name identifies it as a set
+ * of multinational employers in Poland. Its placement makes it market context,
+ * not a fourth proof register.
  *
  * The one gold element it used to carry — the `start` rung on the third
  * specimen, the only confirmed job start shown — went with the specimen tier.
@@ -101,11 +93,8 @@ import { WALL } from './proof-shots'
  * owner's decision, taken on 9 September 2026 with the position stated. The
  * curation that was applied regardless is documented in `proof-shots.ts`.
  *
- * For the six cases: P02's title conflicts across two published records
- * (Associate vs Senior Associate) and P06's does too (business development vs
- * data analyst), so neither row states a title. Four of the nine video
- * strap-lines carry employer names; the note under the block is what keeps them
- * from reading as partnerships.
+ * Four of the nine video strap-lines carry employer names. They locate the
+ * conversation and do not assert a relationship with the employer.
  */
 
 /**
@@ -138,9 +127,6 @@ import { WALL } from './proof-shots'
 const FEATURE = {
   id: '8NZYSVMTdF4',
   title: 'Why good expats make bad money in Poland',
-  description:
-    'Aziz Khaitov sits down with a client who moved from Secret Escapes to HireVue — what her search looked like before, what changed in it, and how the offer came together.',
-  runtime: '32 minutes',
 } as const
 
 /** The nine testimonial videos already published on capitalcareerclub.com/en. */
@@ -194,35 +180,6 @@ const VIDEOS: readonly Video[] = [
   },
 ]
 
-/**
- * The six public case candidates from the results page. Employer locator and
- * milestone only — the research pack records nothing else for any of them, and
- * inventing a "work done" line is the one thing the case anatomy forbids.
- */
-type Case = { id: string; locator: string; stage: 'interview' | 'offer'; milestone: string }
-
-const CASES: readonly Case[] = [
-  { id: 'P01', locator: 'ING → US Bank · Portfolio risk management', stage: 'offer', milestone: 'Signed offer' },
-  { id: 'P02', locator: 'Alcon · Data science', stage: 'offer', milestone: 'Signed offer' },
-  { id: 'P03', locator: 'Oanda · Senior cash management', stage: 'interview', milestone: 'Interview' },
-  { id: 'P04', locator: 'Smith & Nephew · Senior master data management', stage: 'interview', milestone: 'Interview' },
-  { id: 'P05', locator: 'Cantor Fitzgerald · AVP', stage: 'interview', milestone: 'Interview' },
-  { id: 'P06', locator: 'Linklaters', stage: 'offer', milestone: 'Signed offer' },
-]
-
-/**
- * Register label. The three prongs are one section, so they are separated by a
- * named rule rather than by a heading — a second and third `h2` here would claim
- * three arguments where there is one.
- */
-function Register({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-tight border-b border-line pb-tight">
-      <Label>{children}</Label>
-    </div>
-  )
-}
-
 export function Outcomes() {
   return (
     <Section id="outcomes" width="bleed">
@@ -235,19 +192,20 @@ export function Outcomes() {
             </Display>
             <div className="pt-flow-m md:pt-flow">
               <Lede>
-                Posts from the client community, nine filmed conversations, and the cases published
-                on our results page.
+                Posts from the client community and nine filmed conversations.
               </Lede>
             </div>
           </Band>
         </Reveal>
 
+        <Band width="structure">
+          <Reveal delay={0.04}>
+            <LogoCarousel />
+          </Reveal>
+        </Band>
+
         {/* Register 1 — the wall, at the section's full bleed width. */}
         <Stack gap="flow">
-          <Reveal>
-            <Register>From the client community</Register>
-          </Reveal>
-
           <Reveal delay={0.04}>
             <ProofWall shots={WALL} />
           </Reveal>
@@ -255,24 +213,13 @@ export function Outcomes() {
 
         {/* Register 2 — the nine videos, 3×3, banded back to structure. */}
         <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
-          <Reveal>
-            <Register>In their own words</Register>
-          </Reveal>
-
           <Reveal delay={0.04}>
-            <figure className="flex flex-col gap-flow-m md:gap-flow">
-              <VideoEmbed
-                id={FEATURE.id}
-                title={FEATURE.title}
-                control="accent"
-                poster="max"
-              />
-              <figcaption className="mx-auto flex max-w-text flex-col gap-tight text-center">
-                <H3>{FEATURE.title}</H3>
-                <p className="text-base text-body [text-wrap:pretty]">{FEATURE.description}</p>
-                <Caption>{FEATURE.runtime}</Caption>
-              </figcaption>
-            </figure>
+            <VideoEmbed
+              id={FEATURE.id}
+              title={FEATURE.title}
+              control="accent"
+              poster="max"
+            />
           </Reveal>
 
           <Reveal delay={0.08}>
@@ -285,37 +232,6 @@ export function Outcomes() {
                 </li>
               ))}
             </ul>
-          </Reveal>
-        </Band>
-
-        {/* Register 3 — the published cases, banded back to structure. */}
-        <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
-          <Reveal>
-            <Register>Published cases</Register>
-          </Reveal>
-
-          <Reveal delay={0.04}>
-            <ul className="grid grid-cols-1 md:grid-cols-2 md:gap-x-block">
-              {CASES.map((entry) => (
-                <li
-                  key={entry.id}
-                  className="flex flex-col gap-tight border-t border-line-soft py-flow-m md:py-flow"
-                >
-                  <span className="text-s text-ink">{entry.locator}</span>
-                  <div className="flex">
-                    <OutcomeBadge stage={entry.stage}>{entry.milestone}</OutcomeBadge>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <Band width="text">
-              <Caption>
-                Employer names locate a public example. They do not indicate a partnership.
-              </Caption>
-            </Band>
           </Reveal>
         </Band>
       </Stack>

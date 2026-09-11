@@ -20,11 +20,9 @@
  *
  * The three are not discarded — they are folded into the wall at positions 2, 14
  * and 27, because they are among the strongest captures in the corpus. What the
- * full-bleed width buys back is size: at four and five columns across the
- * viewport a tile is 240–370px rather than the 240px it had inside
- * `w-structure`, so on a wide screen a post headline is legible where it was
- * texture before. It is not the same as a plate at 990px, and that trade is
- * recorded here rather than argued again.
+ * full-bleed width buys back is size: the wall now runs one column on mobile,
+ * two from `md` and three from `xl`, and every plate opens at intrinsic size in
+ * a proof viewer. The source remains unaltered in both presentations.
  *
  * ── What was left out, and why ──────────────────────────────────────────────
  *

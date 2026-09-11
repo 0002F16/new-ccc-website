@@ -7,8 +7,9 @@ export function generateStaticParams() {
   return routedHeroVariants.map((variant) => ({ slug: variant.path.split('/').pop()! }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const variant = getRoutedHeroVariant(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const variant = getRoutedHeroVariant(slug)
   if (!variant) return {}
 
   return {
@@ -18,8 +19,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   }
 }
 
-export default function VariantPage({ params }: { params: { slug: string } }) {
-  const variant = getRoutedHeroVariant(params.slug)
+export default async function VariantPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const variant = getRoutedHeroVariant(slug)
   if (!variant) notFound()
 
   return <LandingPage variant={variant} />

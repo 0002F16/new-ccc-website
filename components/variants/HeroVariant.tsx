@@ -20,24 +20,79 @@ import type { HeroVariant } from './hero-variants'
 const stats: Stat[] = [
   { figure: '200+', label: 'Internationals placed in Poland' },
   { figure: '20M+ PLN', label: 'Earned by clients annually' },
-  { figure: '1,000+', label: 'Job interviews landed in Poland' },
+  { figure: '2,000+', label: 'Job interviews landed in Poland' },
   { figure: '40–60 days', label: 'Average time to dream job offer' },
 ]
 
 const LOOM_ID = 'ee574d181bb7444e84884afa81a9bc58'
 
+const clientAvatars = [
+  {
+    src: '/images/client-avatar-01.png',
+    zoom: 1.72,
+    faceX: 52,
+    faceY: 36,
+    hover: 'group-hover/client-avatars:-translate-y-[4px] group-hover/client-avatars:-rotate-[6deg] group-hover/client-avatars:scale-110',
+  },
+  {
+    src: '/images/client-avatar-02.jpeg',
+    zoom: 1.78,
+    faceX: 52,
+    faceY: 38,
+    hover: 'group-hover/client-avatars:translate-x-[2px] group-hover/client-avatars:translate-y-[2px] group-hover/client-avatars:rotate-[3deg] group-hover/client-avatars:scale-105',
+  },
+  {
+    src: '/images/client-avatar-03.png',
+    zoom: 1.58,
+    faceX: 50,
+    faceY: 32,
+    hover: 'group-hover/client-avatars:translate-x-[4px] group-hover/client-avatars:-translate-y-[3px] group-hover/client-avatars:-rotate-[2deg] group-hover/client-avatars:scale-105',
+  },
+  {
+    src: '/images/client-avatar-04.jpeg',
+    zoom: 1.42,
+    faceX: 53,
+    faceY: 37,
+    hover: 'group-hover/client-avatars:translate-x-[6px] group-hover/client-avatars:translate-y-[2px] group-hover/client-avatars:rotate-[5deg] group-hover/client-avatars:scale-105',
+  },
+  {
+    src: '/images/client-avatar-05.jpeg',
+    zoom: 1.48,
+    faceX: 49,
+    faceY: 36,
+    hover: 'group-hover/client-avatars:translate-x-[8px] group-hover/client-avatars:-translate-y-[2px] group-hover/client-avatars:-rotate-[3deg] group-hover/client-avatars:scale-105',
+  },
+] as const
+
 function ClientAvatarStrip() {
   return (
-    <Image
-      src="/images/client-avatar-strip.png"
-      alt=""
-      width={300}
-      height={111}
-      sizes="86px"
-      priority
-      aria-hidden
-      className="h-[32px] w-auto shrink-0"
-    />
+    <div className="group/client-avatars flex shrink-0 items-center py-[4px]" aria-hidden>
+      {clientAvatars.map(({ src, zoom, faceX, faceY, hover }, index) => (
+        <div
+          key={src}
+          className={`relative size-[32px] overflow-hidden rounded-full border-2 border-ground bg-surface motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out ${hover} ${
+            index === 0 ? '' : '-ml-[8px]'
+          }`}
+          style={{ zIndex: clientAvatars.length - index }}
+        >
+          <Image
+            src={src}
+            alt=""
+            width={96}
+            height={96}
+            sizes="32px"
+            priority
+            className="absolute max-w-none object-cover"
+            style={{
+              width: `${zoom * 100}%`,
+              height: `${zoom * 100}%`,
+              left: `${50 - zoom * faceX}%`,
+              top: `${50 - zoom * faceY}%`,
+            }}
+          />
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -103,7 +158,7 @@ function BaselineHero({ variant }: { variant: HeroVariant }) {
         </Stack>
 
         <Reveal delay={0.12}>
-          <CtaBlock note={variant.ctaNote} />
+          <CtaBlock analyticsId="hero" note={variant.ctaNote} />
         </Reveal>
 
         <Reveal delay={0.16} className="w-full">
@@ -162,7 +217,7 @@ function VideoFirstHero({ variant }: { variant: HeroVariant }) {
           )}
 
           <Reveal delay={0.2}>
-            <CtaBlock note={variant.ctaNote} />
+            <CtaBlock analyticsId="hero" note={variant.ctaNote} />
           </Reveal>
         </Stack>
 
@@ -230,7 +285,7 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
         )}
 
         <Reveal delay={0.24}>
-          <CtaBlock note={variant.ctaNote} />
+          <CtaBlock analyticsId="hero" note={variant.ctaNote} />
         </Reveal>
 
         {variant.showStats !== false && (

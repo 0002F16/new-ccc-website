@@ -1,11 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import Image from 'next/image'
+import { useRef, useState } from 'react'
 import { cx } from './cx'
 
+function HeroPoster() {
+  return (
+    <Image
+      src="/images/hero-video-thumbnail.jpg"
+      alt=""
+      fill
+      priority
+      sizes="(min-width: 1024px) 1040px, calc(100vw - 32px)"
+      className="object-cover"
+    />
+  )
+}
+
 /**
- * A click-to-play Loom facade. The Loom player is not loaded until requested,
- * keeping the hero fast while still letting a visitor watch without leaving it.
+ * A click-to-play Loom facade. Its local poster is priority-loaded with the hero,
+ * while the Loom player itself is not requested until the visitor activates it.
  */
 export function LoomEmbed({
   id,
@@ -19,6 +33,9 @@ export function LoomEmbed({
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
+  const [ready, setReady] = useState(false)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const showPlayer = playing || eager
 
   return (
     <div
@@ -27,39 +44,55 @@ export function LoomEmbed({
         className,
       )}
     >
-      {playing || eager ? (
-        <iframe
-          src={`https://www.loom.com/embed/${id}?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&autoplay=${playing ? '1' : '0'}`}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          className="absolute inset-0 h-full w-full border-0"
-        />
+      {showPlayer ? (
+        <>
+          <iframe
+            ref={iframeRef}
+            src={`https://www.loom.com/embed/${id}?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&autoplay=${playing ? '1' : '0'}`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            onLoad={() => {
+              setReady(true)
+              if (playing) iframeRef.current?.focus()
+            }}
+            className={cx(
+              'absolute inset-0 h-full w-full border-0 transition-opacity duration-ui-slow ease-ui',
+              eager || ready ? 'opacity-100' : 'opacity-0',
+            )}
+          />
+          {!eager && (
+            <>
+              <div
+                aria-hidden
+                className={cx(
+                  'pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center overflow-hidden bg-surface transition-opacity duration-ui-slow ease-ui',
+                  ready ? 'opacity-0' : 'opacity-100',
+                )}
+              >
+                <HeroPoster />
+              </div>
+              {!ready && (
+                <span className="sr-only" role="status">
+                  Loading video
+                </span>
+              )}
+            </>
+          )}
+        </>
       ) : (
         <button
           type="button"
           onClick={() => setPlaying(true)}
+          data-analytics-event="video_start"
+          data-analytics-id="hero-video"
+          data-analytics-hesitation="true"
+          data-analytics-outcome="media"
           aria-label={`Play video: ${title}`}
-          className="group absolute inset-0 flex h-full w-full items-center justify-center bg-surface text-left"
+          className="group absolute inset-0 flex h-full w-full items-center justify-center overflow-hidden bg-surface text-left"
         >
-          <span
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-px bg-line-gold"
-          />
-          <span className="relative flex flex-col items-center gap-flow-m px-card-m text-center md:gap-flow md:px-card">
-            <span className="flex h-[64px] w-[64px] items-center justify-center rounded-[32px] bg-accent transition duration-ui ease-ui group-hover:bg-accent-hover group-hover:-translate-y-px">
-              <svg aria-hidden width="20" height="22" viewBox="0 0 20 22" className="ml-1 text-accent-on">
-                <path d="M2 2l16 9-16 9V2z" fill="currentColor" />
-              </svg>
-            </span>
-            <span className="flex flex-col gap-tight">
-              <span className="text-label font-medium uppercase text-accent">Watch the overview</span>
-              <span className="max-w-narrow text-s text-body">
-                See how Capital Career Club builds and runs a job-search campaign.
-              </span>
-            </span>
-          </span>
+          <HeroPoster />
         </button>
       )}
     </div>

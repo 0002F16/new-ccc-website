@@ -1,5 +1,10 @@
 import { LandingPage } from '@/components/variants/LandingPage'
 import { getHeroVariant } from '@/components/variants/hero-variants'
+import { headers } from 'next/headers'
+import { assignExperiment, experimentHeroCopy } from '@/lib/analytics/experiments'
+import { getActiveHomepageExperiment } from '@/lib/analytics/store'
+import { isHeatmapSample } from '@/lib/analytics/signing'
+import { databaseConfigured } from '@/lib/db'
 
 /**
  * Six sections, down from twenty-one (9 September 2026), down to five on
@@ -26,6 +31,32 @@ import { getHeroVariant } from '@/components/variants/hero-variants'
  *   14-division-of-labour · 16-fee · 20-day-seven · 22-footer
  *                        cut — removed from the shared page by owner
  */
-export default function Page() {
-  return <LandingPage variant={getHeroVariant('working')!} />
+export const dynamic = 'force-dynamic'
+
+export default async function Page() {
+  const requestHeaders = await headers()
+  const trackingEnabled =
+    (databaseConfigured() || process.env.ANALYTICS_TEST_MODE === 'true') &&
+    process.env.ANALYTICS_ENABLED !== 'false' &&
+    requestHeaders.get('x-ccc-tracking') === '1'
+  const visitorId = trackingEnabled ? requestHeaders.get('x-ccc-visitor-id') : null
+  const sessionId = trackingEnabled ? requestHeaders.get('x-ccc-session-id') : null
+  const definition = trackingEnabled && databaseConfigured() ? await getActiveHomepageExperiment() : null
+  const experiment = assignExperiment(visitorId, definition)
+  const heroCopy = experimentHeroCopy(definition, experiment)
+  const baseVariant = getHeroVariant('working')!
+  const variant = heroCopy
+    ? { ...baseVariant, headline: heroCopy.headline, accentPhrase: heroCopy.accentPhrase }
+    : baseVariant
+
+  return (
+    <LandingPage
+      variant={variant}
+      analytics={{
+        enabled: trackingEnabled,
+        heatmapSample: Boolean(sessionId && isHeatmapSample(sessionId)),
+        experiment,
+      }}
+    />
+  )
 }

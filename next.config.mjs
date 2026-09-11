@@ -13,6 +13,9 @@ const nextConfig = {
     // to upscale a 900px screenshot to 3840px. Those requests never finished and
     // four tiles stayed blank. Capping the ladder makes that unrepresentable.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    // Default is 60s, so browsers revalidated every optimised image each minute.
+    // Sources in /public only change with a deploy, so cache for 31 days.
+    minimumCacheTTL: 2678400,
   },
 };
 export default nextConfig;

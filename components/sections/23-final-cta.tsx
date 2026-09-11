@@ -102,7 +102,10 @@ export function FinalCta() {
           at a call site.
         */}
         <Reveal delay={0.04}>
-          <CtaBlock note="Thirty minutes on a call, and we tell you whether we would take this on." />
+          <CtaBlock
+            analyticsId="final"
+            note="Thirty minutes on a call, and we tell you whether we would take this on."
+          />
         </Reveal>
       </Stack>
     </Section>

@@ -1,0 +1,200 @@
+{
+  "generatedAt": "2026-09-11T12:15:48.622Z",
+  "source": "http://localhost:3210",
+  "layouts": {
+    "mobile": {
+      "width": 390,
+      "height": 844
+    },
+    "tablet": {
+      "width": 900,
+      "height": 1000
+    },
+    "desktop": {
+      "width": 1200,
+      "height": 900
+    },
+    "wide": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  "sections": [
+    "hero",
+    "two-situations",
+    "bottlenecks",
+    "outcomes",
+    "faq",
+    "apply"
+  ],
+  "images": [
+    {
+      "layout": "mobile",
+      "section": "hero",
+      "filename": "mobile-hero.jpg",
+      "width": 390,
+      "height": 1157
+    },
+    {
+      "layout": "mobile",
+      "section": "two-situations",
+      "filename": "mobile-two-situations.jpg",
+      "width": 390,
+      "height": 607
+    },
+    {
+      "layout": "mobile",
+      "section": "bottlenecks",
+      "filename": "mobile-bottlenecks.jpg",
+      "width": 390,
+      "height": 1188
+    },
+    {
+      "layout": "mobile",
+      "section": "outcomes",
+      "filename": "mobile-outcomes.jpg",
+      "width": 390,
+      "height": 10835
+    },
+    {
+      "layout": "mobile",
+      "section": "faq",
+      "filename": "mobile-faq.jpg",
+      "width": 390,
+      "height": 696
+    },
+    {
+      "layout": "mobile",
+      "section": "apply",
+      "filename": "mobile-apply.jpg",
+      "width": 390,
+      "height": 1456
+    },
+    {
+      "layout": "tablet",
+      "section": "hero",
+      "filename": "tablet-hero.jpg",
+      "width": 900,
+      "height": 1176
+    },
+    {
+      "layout": "tablet",
+      "section": "two-situations",
+      "filename": "tablet-two-situations.jpg",
+      "width": 900,
+      "height": 661
+    },
+    {
+      "layout": "tablet",
+      "section": "bottlenecks",
+      "filename": "tablet-bottlenecks.jpg",
+      "width": 900,
+      "height": 746
+    },
+    {
+      "layout": "tablet",
+      "section": "outcomes",
+      "filename": "tablet-outcomes.jpg",
+      "width": 900,
+      "height": 7239
+    },
+    {
+      "layout": "tablet",
+      "section": "faq",
+      "filename": "tablet-faq.jpg",
+      "width": 900,
+      "height": 813
+    },
+    {
+      "layout": "tablet",
+      "section": "apply",
+      "filename": "tablet-apply.jpg",
+      "width": 900,
+      "height": 1473
+    },
+    {
+      "layout": "desktop",
+      "section": "hero",
+      "filename": "desktop-hero.jpg",
+      "width": 1200,
+      "height": 1282
+    },
+    {
+      "layout": "desktop",
+      "section": "two-situations",
+      "filename": "desktop-two-situations.jpg",
+      "width": 1200,
+      "height": 637
+    },
+    {
+      "layout": "desktop",
+      "section": "bottlenecks",
+      "filename": "desktop-bottlenecks.jpg",
+      "width": 1200,
+      "height": 771
+    },
+    {
+      "layout": "desktop",
+      "section": "outcomes",
+      "filename": "desktop-outcomes.jpg",
+      "width": 1200,
+      "height": 7989
+    },
+    {
+      "layout": "desktop",
+      "section": "faq",
+      "filename": "desktop-faq.jpg",
+      "width": 1200,
+      "height": 813
+    },
+    {
+      "layout": "desktop",
+      "section": "apply",
+      "filename": "desktop-apply.jpg",
+      "width": 1200,
+      "height": 1473
+    },
+    {
+      "layout": "wide",
+      "section": "hero",
+      "filename": "wide-hero.jpg",
+      "width": 1440,
+      "height": 1282
+    },
+    {
+      "layout": "wide",
+      "section": "two-situations",
+      "filename": "wide-two-situations.jpg",
+      "width": 1440,
+      "height": 637
+    },
+    {
+      "layout": "wide",
+      "section": "bottlenecks",
+      "filename": "wide-bottlenecks.jpg",
+      "width": 1440,
+      "height": 771
+    },
+    {
+      "layout": "wide",
+      "section": "outcomes",
+      "filename": "wide-outcomes.jpg",
+      "width": 1440,
+      "height": 5260
+    },
+    {
+      "layout": "wide",
+      "section": "faq",
+      "filename": "wide-faq.jpg",
+      "width": 1440,
+      "height": 813
+    },
+    {
+      "layout": "wide",
+      "section": "apply",
+      "filename": "wide-apply.jpg",
+      "width": 1440,
+      "height": 1473
+    }
+  ]
+}

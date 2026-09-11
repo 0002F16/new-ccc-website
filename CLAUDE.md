@@ -71,17 +71,22 @@ hours and short of access. Those are the only two things I sell."
 ## Stack
 
 - Next.js + Tailwind
-- `motion` (Motion for React), added 9 September 2026. Permitted for exactly two
-  things: the hero load stagger, and one scroll reveal per section via `Reveal`.
-  Nothing else — no parallax, no layout animation, no counters.
-- Deploy target: **Vercel**, decided 10 September 2026. Resolved against the
-  existing VPS at 76.13.177.250, which hosts unrelated apps (fyxor.eu, the CV
-  Tailor API) behind nginx and pm2 — nothing on this page needs to sit beside
-  them, and Next.js on Vercel is zero-config. Source of truth is the GitHub
-  repo `0002F16/new-ccc-website`; `main` is production and every push
-  redeploys. No environment variables are required — the page has no API keys,
-  no database and no server-side integrations yet. That changes the moment the
-  application form or Calendly is wired in, which is still OPEN.
+- Motion is CSS-first: the hero load stagger and section entry use `Reveal`,
+  while interactive controls may use tokenised state transitions and the three
+  bottleneck diagrams may use their documented hover response. No parallax,
+  scroll-jacking, layout animation or counters. No animation dependency.
+- Deploy target: **the CRM's VPS at 82.165.172.90**, decided 10 September 2026
+  (later the same day), replacing 76.13.177.250, which had replaced the
+  same-day Vercel decision. Nginx proxies the Next.js app under PM2
+  (`ccc-website`, port 3210) next to the CRM (`crm`, port 3002, `/opt/crm`,
+  crm.fyxor.eu); PostgreSQL stores first-party analytics on localhost in its own
+  `ccc_analytics` database. The previous Vercel deployment remains a DNS
+  rollback target during the first observation window. Source of truth remains
+  `0002F16/new-ccc-website`.
+- Applications: the `#apply` form posts to `/api/applications`, which forwards
+  to the CRM's `/api/intake` over localhost. **The CRM is the only store for
+  application data** — nothing from the form is written to the analytics
+  database. The CRM notifies Telegram and holds the Accept/Reject inbox.
 - Component library: none exists. Primitives get built from the design system
   before section work starts.
 
@@ -426,6 +431,12 @@ Gold hairline → eyebrow → `h2` → optional `body-l` lede at `w-text`. Gaps:
   `components/ui/Button.tsx` is the single source; never hardcode a label.
   (Was "Apply for a fit call" until 9 September 2026.)
 - Minimum target 44×44. Never a bare icon button.
+- CTA buttons carry one 1.5px arrow: the label shifts 2px left and the arrow
+  extends on hover or focus; press returns the button to its baseline at .99
+  scale. This is feedback, not a second accent.
+- `type="submit"` renders the same primary as a `<button>` inside the
+  application form. Same label, same geometry; `disabled` drops to 60% opacity
+  while submitting. Added 10 September 2026.
 
 ### CTA block
 Primary button, then a `caption` in `muted` at `w-narrow`, gap `space-flow`,
@@ -523,6 +534,63 @@ recolour the artefact — it is evidence, and altering it makes it worthless.
 `label` small caps, `muted`. Error text in `accent` below the field, stating
 what is wrong and how to fix it. Never placeholder-as-label.
 
+### Choice group
+Added 10 September 2026 for the application form's urgency question. A
+`<fieldset>` whose `<legend>` is the `label` small-caps heading, then one row per
+option: a native radio inside a `<label>` row — `surface`, `1px line`, `4px`
+radius, `12px 14px`, minimum 44px tall, `body-s` text in `body`. The radio uses
+`accent-color: accent`. The checked row takes an `accent` border and an
+`accent-wash` fill, the permitted active state; its text goes to `ink`. Error
+text in `accent` under the group, exactly as Form field.
+**Never:** pills, more than five options, a custom-drawn radio that loses
+native keyboard behaviour, or a pre-selected answer.
+
+### Phone field
+Added 10 September 2026 (form v2). Label above in `label` small caps, as Form
+field. One bordered row, `surface`, `1px line`, 4px radius, border `accent` on
+focus-within. On the left is a country button showing the ISO code in `label`
+small caps, the dial code in `body` tabular numerals and a 1.5px chevron, split
+from the number input by a `line` rule. The button opens a popover at the row's
+width: a search box at the top, then a list up to 320px tall with one row per
+country (name · ISO code · `+code`, `body-s`, 44px targets). The active row is
+`accent-wash`. Poland is pinned first; the rest are alphabetical. Country names
+come from `Intl.DisplayNames`. The number formats as it is typed, and pasting a
+`+` number switches the country.
+**Never:** flag emoji (the system forbids emoji), pills, or a native `<select>`
+styled to look custom.
+
+### CV field
+Added 10 September 2026 (form v2), enlarged 11 September 2026. A `<fieldset>`
+whose legend is the small-caps label. The whole file control is a **solid**
+`1px line` drop zone on `surface`, at least 168px tall, with a document-upload
+icon, "Drag & drop your CV here" as the primary instruction, a secondary
+"choose a file" link treatment and muted format/size help. The entire empty
+zone opens the native file picker. Once a file is chosen, the zone contracts to
+a 104px confirmation row showing its name in `ink`, its size in `muted`, a
+document-check icon and a Ghost "Remove". Dragging a file over the zone turns
+its border `accent` and its fill `accent-wash`. The file is required; there is
+no link alternative (removed at the owner's request, 10 September 2026). Error
+text is `accent`, under the fieldset.
+**Never:** a dashed drop zone (dashed is reserved for unverified material), an
+upload progress animation that hides the form, or accepting anything other than
+PDF or Word.
+
+### Application form
+Added 10 September 2026. The page's conversion point, in `#apply` at
+`w-narrow`. Anatomy, top to bottom: eyebrow → `h2` → one `body` sentence → the
+fields in fixed order (name · email · phone field · choice group for when
+they need a job · why they want to work with us · CV field) → primary
+submit → `caption` privacy line. Gap `space-flow` between fields.
+
+States: **idle**; **submitting** (button disabled, label unchanged);
+**field error** (per-field `accent` text, focus moves to the first invalid
+field); **send error** (one `accent` line above the button saying to try
+again — the entries stay filled); **sent** (the form is replaced in place by
+an `h3` and one `body` sentence in an `aria-live` region).
+**Never:** placeholder-as-label, auto-submit, a second primary, a promised reply
+time, or copy that implies acceptance. The confirmation says it was received;
+it does not say what the answer will be.
+
 ### Stat row
 Added 9 September 2026. Headline proof above the hero `h1`. Figure in `ink` at
 `h3` with tabular numerals, label beneath in `muted` small caps, items divided by
@@ -539,15 +607,34 @@ third-party cookies on arrival.
 **Never** autoplay on arrival, never a black rectangle as the poster, never a
 `<div>` where the control must be a `<button>`.
 
+The hero Loom component uses its raw local 1280×720 JPEG as the entire facade.
+There is no tint, dark overlay, custom play control, facade copy or external
+caption. The image is priority-loaded; clicking anywhere on it loads Loom with
+autoplay, while the unaltered thumbnail remains visible until the iframe is ready.
+
 ### Reveal
-Added 9 September 2026. The page's only motion device — see Motion below. Wraps a
-block; 8px rise over 240ms, once, on entering the viewport. `delay` staggers a
-group at 40ms steps.
+Added 9 September 2026. The page's only content-entry motion — see Motion below.
+Wraps a block; 8px rise over 240ms, once, on load. `delay` staggers a group at
+40ms steps. State feedback on real controls and the documented bottleneck SVG
+hover response do not use `Reveal`.
 **Never** wrap something whose absence would break the page if motion fails, and
 never use it to sequence content a reader is waiting on.
 
+### Employer logo carousel
+Added 10 September 2026 at the owner's request, between the Outcomes introduction
+and the proof wall. A single slow, linear rail of transparent local PNG
+wordmarks, rendered monochrome in `ink` at reduced opacity. It pauses whenever
+the rail is hovered and enlarges only the hovered wordmark. The repeated sequence
+is visual only and is hidden from assistive technology.
+
+This is market context, not proof. Its accessible region name is **Multinational
+employers in Poland**; no visible heading or relationship copy accompanies the
+rail. Never introduce “our clients work at”, “trusted by”, or any equivalent
+relationship claim. Under reduced motion, the second sequence disappears and
+the first wraps into a static list.
+
 ### Proof wall
-Added 9 September 2026, for the three-pronged proof section. The volume device:
+Added 9 September 2026 for the Outcomes section. The volume device:
 many client screenshots at once, so the page can show that a lot of people got
 somewhere without stating a number the claim rules forbid.
 
@@ -559,20 +646,24 @@ same day, after the owner cut the legible specimen tier that had preceded it. Th
 original rule here required two to three specimens on `WorkProductPlate`s above
 every wall, because at 240px a screenshot is texture and texture alone is
 decoration claiming to be evidence. That rule is withdrawn on one condition: the
-wall must span the viewport, so tiles grow with the screen — 244px at 1280,
-371px at 1920 — instead of staying at the 240px they had inside `w-structure`.
+wall must span the viewport, so plates grow with the screen — roughly 403px at
+1280 and 616px at 1920 — instead of staying at the 240px they had inside
+`w-structure`.
 A wall confined to `w-structure` with no specimen tier is still forbidden. Size
 is the whole compensation.
 
-Anatomy: CSS multi-column masonry, `columns-2 md:columns-3 lg:columns-4
-xl:columns-5`, each tile `break-inside-avoid`, the artefact unaltered inside
+Anatomy: CSS multi-column masonry, `columns-1 md:columns-2 xl:columns-3`, each
+tile `break-inside-avoid`, the artefact unaltered inside
 `surface`, `1px line`, `4px` radius and `space-tight` of dark padding — a plate
 at wall scale. `next/image` with intrinsic width and height from the file, lazy
-below the fold. One `label` naming the register; no per-tile caption.
+below the fold. Each plate is a real button that opens the unaltered image at
+its intrinsic size in a keyboard-operable modal; its existing alt text becomes
+the modal caption. No visible register label or per-tile caption at rest.
 
-Past `xl` the column count stops rising. Tiles get bigger, not more numerous —
+Past `xl` the column count stops at three. Tiles get bigger, not more numerous —
 the opposite of the usual responsive instinct, and the reason the wall stays
-readable on a large display.
+readable on a large display. The modal provides Previous, Next and Close, wraps
+at both ends, accepts the arrow keys and Escape, and restores trigger focus.
 
 **Reported deviation, deliberate:** CSS columns cannot take `gap`, so tiles carry
 a bottom margin. This is the one place in the system where a margin sets rhythm
@@ -584,18 +675,6 @@ fixed aspect ratio: the corpus runs from 10.87:1 to 0.73:1. **Never** randomise
 the order or the selection — hand-authored constant, or it is a fabrication.
 **Never** a fade-out mask at the foot of the wall to imply more: that is a
 gradient, and the count of what is shown is the honest version of the same idea.
-
-### Case ledger
-Added 9 September 2026. A compact list of published cases — employer locator and
-role in `ink`, an outcome badge per row, rows divided by `line-soft`, two columns
-of three at `md`.
-
-It exists because `CaseCard` cannot be honestly instantiated: that component makes
-"Work done" mandatory and specific, and no work-done fact is recorded for any of
-P01–P06. The ledger states only what the results page publishes — who, what role,
-which milestone — and stops there. When a case is verified it graduates to a
-`CaseCard` above the ledger; the ledger is the holding pattern, not a replacement.
-**Never** give a ledger row the `start` rung until a job start is established.
 
 ## Overridden 9 September 2026
 
@@ -618,15 +697,21 @@ forgotten. The rest of the claim rules stand unchanged.
 - Durations: `160ms` for hover and focus, `240ms` for anything that moves or
   reveals. **No single element animates longer than 240ms; a staggered group may
   total 500ms.** (Amended 9 September 2026 — the hero stagger is six items at
-  40ms steps, 440ms end to end.)
+  40ms steps, 440ms end to end. Amended 10 September 2026 — the one employer
+  carousel is the sole exception: a 34-second linear cycle that pauses on hover.)
 - Easing: `cubic-bezier(.2,.6,.2,1)`.
 - Permitted: 1px hover lift on buttons; border-colour transitions; the FAQ
-  chevron; a fade-and-rise of 8px on section entry. The entry reveal may start at
-  `opacity: 0`, but **only** once, only within 240ms, and only through `Reveal`,
-  which renders content at its final position whenever `prefers-reduced-motion`
-  is set. Nothing else is ever parked invisible. (Amended 9 September 2026.)
-- Forbidden: parallax, scroll-jacking, counters that tick up, marquees,
-  typewriter effects, anything that delays reading.
+  chevron and answer expansion; tab-indicator and selected-panel transitions;
+  video-facade feedback and load crossfades; proof-viewer control feedback; the
+  three documented bottleneck SVG hover responses; and a fade-and-rise of 8px
+  on section entry. SVG internals may stagger at 20ms. The entry reveal may start
+  at `opacity: 0`, but **only** once, only within 240ms, and only through
+  `Reveal`, which renders content at its final position whenever
+  `prefers-reduced-motion` is set. No loading or interactive animation may hide
+  its final content if JavaScript or a third party fails.
+- Forbidden: parallax, scroll-jacking, counters that tick up, typewriter effects,
+  any marquee other than the documented employer carousel, and anything that
+  delays reading.
 - `@media (prefers-reduced-motion: reduce)` disables all of it. Not optional.
 
 ## Imagery and icons
@@ -643,8 +728,9 @@ forgotten. The rest of the claim rules stand unchanged.
 - **Icons:** 1.5px stroke, 20px, line only, never filled, never coloured except
   `accent` on an active state.
 - **Diagrams** (added 9 September 2026). Inline SVG only, no illustration
-  library. Fills limited to `line`, `body` and `ink`; strokes 1.5px; **never
-  `accent`** — a diagram is not the one gold thing on a screen. Always
+  library. Fills limited to `line`, `body` and `ink`; strokes 1.5px. Accent is
+  reserved for the documented repeated "gold marks the reader" device in the
+  three bottleneck diagrams and is forbidden in other diagrams. Always
   `aria-hidden`, with the meaning carried by the adjacent heading and body, since
   a diagram of an argument is not an accessible substitute for the argument.
   Always captioned `Illustrative.` — these draw a claim, they do not measure one.
@@ -721,7 +807,8 @@ Violating any of these is a defect, not a preference.
 - No value-stack pricing theatre — no crossed-out totals, no per-item values
   summing to an inflated figure.
 - No income or salary figures as proof. No follower counts. No placement rates.
-- No logo wall without context. Employer names locate an example and nothing more.
+- No logo wall without context. The employer carousel is the sole exception and
+  must retain its neutral Poland-market accessible name.
 - No numbered markers on content that is not a real sequence.
 - No section whose only content is a heading and three feature cards.
 
@@ -802,7 +889,11 @@ Added 8 September 2026, revision 2 — each maps to a section in the IA spec:
   consumer’s express request to start early and acknowledgement of the effect.
 - `[CONFIRM CONTROLLER, PROCESSORS, TRANSFERS]` — the inline application form and
   Calendly both collect personal data, and Calendly is a US processor. Needed
-  before the footer and the application step can be built.
+  before the footer and the application step can be built. **Partly overtaken
+  10 September 2026:** the owner had the application form built. It ships with
+  an interim one-line privacy caption; the form's data goes to the CRM and to
+  Telegram (a non-EEA processor that receives each application's details). The
+  counsel-reviewed notice is still owed and replaces the caption when it lands.
 - **A working Calendly URL.** Every CTA on the live site points at one that
   redirects to the Calendly homepage. Needs a human click to confirm.
 - **Whether a VSL exists.** The audit found none on the live site — only nine
@@ -872,10 +963,14 @@ sentence for the KRAZ question while that question is open.
   the name removed). The design system treats work product as the primary
   visual proof class.
 - Whether a Polish-language version is needed.
-- Page location (path or subdomain), the application form or booking tool, and
-  UTM/analytics so the funnel in the strategy brief can actually be measured.
-- ~~Deploy target~~ — decided 10 September 2026: Vercel, deploying from `main`
-  of `0002F16/new-ccc-website`. See Stack.
+- ~~The application form~~ — built 10 September 2026: `#apply` form → CRM
+  inbox → Telegram with Accept/Reject. A booking tool is still not chosen. The
+  reserved application and booking analytics events still have no producer.
+- ~~Page location and deploy target~~ — decided 10 September 2026: replace
+  `capitalcareerclub.com` from the CRM's VPS, 82.165.172.90. See Stack.
+- **The CRM has no authentication.** Its Accept/Reject inbox is reachable by
+  anyone who finds crm.fyxor.eu unless Nginx on the box adds auth. Close before
+  the form goes live.
 
 ## Current phase
 
