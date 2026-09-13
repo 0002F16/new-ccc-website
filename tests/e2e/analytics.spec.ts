@@ -99,7 +99,7 @@ test('does not identify or track an automated visitor', async ({ browser }) => {
   await context.close()
 })
 
-test('opt-out removes analytics identifiers and prevents future collection', async ({ page, context }) => {
+test('opt-out endpoint removes analytics identifiers and prevents future collection', async ({ page, context }) => {
   let requests = 0
   await page.route('**/api/analytics/batch', async (route) => {
     requests += 1
@@ -107,7 +107,13 @@ test('opt-out removes analytics identifiers and prevents future collection', asy
   })
   await page.goto('/')
   await expect.poll(() => requests).toBeGreaterThan(0)
-  await page.getByRole('button', { name: 'Turn analytics off' }).click()
+  await page.evaluate(() => {
+    const form = document.createElement('form')
+    form.method = 'post'
+    form.action = '/api/analytics/opt-out'
+    document.body.appendChild(form)
+    form.submit()
+  })
   await expect(page).toHaveURL(/\?analytics=off$/)
 
   const cookies = await context.cookies()

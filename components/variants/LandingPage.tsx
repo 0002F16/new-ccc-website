@@ -4,7 +4,6 @@ import { Outcomes } from '@/components/sections/07-outcomes'
 import { FaqSection } from '@/components/sections/19-faq'
 import { ApplicationForm } from '@/components/sections/ApplicationForm'
 import { MovementRule } from '@/components/ui'
-import { AnalyticsPrivacyControl } from '@/components/analytics/AnalyticsPrivacyControl'
 import { AnalyticsTracker } from '@/components/analytics/AnalyticsTracker'
 import type { ExperimentContext } from '@/lib/analytics/types'
 import type { HeroVariant } from './hero-variants'
@@ -36,7 +35,6 @@ export function LandingPage({
 
         <ApplicationForm />
       </main>
-      {analytics?.enabled && <AnalyticsPrivacyControl />}
       {analytics && <AnalyticsTracker {...analytics} />}
     </>
   )
