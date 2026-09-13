@@ -189,8 +189,8 @@ export function ApplicationForm() {
                 </span>
               </H3>
               <Body>
-                The team reads every application. If it looks like a fit, we will contact you by
-                email or phone to arrange a 30-minute call.
+                Your application has been received, and our team will review it carefully. Please
+                check your email for confirmation and next steps.
               </Body>
             </div>
           ) : (
