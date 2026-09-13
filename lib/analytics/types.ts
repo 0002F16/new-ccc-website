@@ -14,6 +14,7 @@ export const ANALYTICS_EVENT_NAMES = [
   'application_validation_failed',
   'application_submit_failed',
   'application_submitted',
+  'engaged_time',
   'application_qualified',
   'call_booked',
   'call_attended',

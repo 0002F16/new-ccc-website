@@ -8,6 +8,7 @@ import { compareConversions, experimentVerdict, wilsonInterval } from '@/lib/ana
 import { analyticsBatchSchema } from '@/lib/analytics/validation'
 import { isAutomatedUserAgent, withinRateLimit } from '@/lib/analytics/request'
 import { sanitizeGeo } from '@/lib/analytics/geo'
+import { engagedTimeIncrement } from '@/lib/analytics/engagement'
 import { dashboardMetricDelta, groupDashboardGeography, normalizeDashboardHeatmap } from '@/lib/analytics/store'
 import { publicUrl } from '@/lib/admin-url'
 import argon2 from 'argon2'
@@ -100,6 +101,16 @@ describe('privacy boundaries', () => {
       batchId: crypto.randomUUID(),
       events: [{ id: crypto.randomUUID(), name: 'application_submit_failed', timestamp: Date.now(), sectionId: 'apply' }],
     }).success).toBe(false)
+    expect(analyticsBatchSchema.safeParse({
+      ...base,
+      batchId: crypto.randomUUID(),
+      events: [{ id: crypto.randomUUID(), name: 'engaged_time', timestamp: Date.now(), sectionId: 'hero', value: 8_000 }],
+    }).success).toBe(true)
+    expect(analyticsBatchSchema.safeParse({
+      ...base,
+      batchId: crypto.randomUUID(),
+      events: [{ id: crypto.randomUUID(), name: 'engaged_time', timestamp: Date.now(), value: 8_000 }],
+    }).success).toBe(false)
   })
 
   it('sanitizes coarse geography without retaining an address or unsafe names', () => {
@@ -137,6 +148,21 @@ describe('privacy boundaries', () => {
     expect(withinRateLimit(key, 2, 60_000)).toBe(true)
     expect(withinRateLimit(key, 2, 60_000)).toBe(true)
     expect(withinRateLimit(key, 2, 60_000)).toBe(false)
+  })
+
+  it('counts only recent visible engagement and caps delayed samples', () => {
+    expect(engagedTimeIncrement({
+      wasVisible: true, lastActivityAt: 9_000, previousSampleAt: 9_000, now: 10_000,
+    })).toBe(1_000)
+    expect(engagedTimeIncrement({
+      wasVisible: false, lastActivityAt: 9_000, previousSampleAt: 9_000, now: 10_000,
+    })).toBe(0)
+    expect(engagedTimeIncrement({
+      wasVisible: true, lastActivityAt: 0, previousSampleAt: 39_000, now: 40_000,
+    })).toBe(0)
+    expect(engagedTimeIncrement({
+      wasVisible: true, lastActivityAt: 10_000, previousSampleAt: 10_000, now: 20_000,
+    })).toBe(5_000)
   })
 })
 

@@ -21,8 +21,15 @@ test('captures a privacy-minimised page view, UTM attribution, and CTA placement
   expect(first.events.some((event) => event.name === 'page_view')).toBe(true)
 
   await page.locator('[data-analytics-id="hero"]').click()
+  await page.waitForTimeout(400)
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')))
   await expect.poll(() => batches.some((batch) => JSON.stringify(batch).includes('cta_click'))).toBe(true)
+  await expect.poll(() => batches.some((batch) => JSON.stringify(batch).includes('engaged_time'))).toBe(true)
+
+  const engagementEvents = batches.flatMap((batch) => (
+    (batch.events as { name: string; sectionId?: string; value?: number }[] | undefined) || []
+  )).filter((event) => event.name === 'engaged_time')
+  expect(engagementEvents.some((event) => Boolean(event.sectionId) && Number(event.value) >= 250)).toBe(true)
 
   const cookies = await context.cookies()
   const visitorCookie = cookies.find((cookie) => cookie.name === 'ccc_visitor')

@@ -25,6 +25,16 @@ function metric(value: number, suffix = '') {
   return `${new Intl.NumberFormat('en-GB', { maximumFractionDigits: 1 }).format(value)}${suffix}`
 }
 
+function duration(milliseconds: number) {
+  const seconds = Math.max(0, Math.round(milliseconds / 1000))
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
+  if (minutes < 60) return remainder ? `${minutes}m ${remainder}s` : `${minutes}m`
+  const hours = Math.floor(minutes / 60)
+  return `${hours}h ${minutes % 60}m`
+}
+
 function readable(value: string) {
   return value.replaceAll('_', ' ').replaceAll('-', ' ')
 }
@@ -42,7 +52,9 @@ function MetricCard({ item }: { item: DashboardMetric }) {
     <article className="rounded border border-line bg-surface p-card-m shadow-card md:p-card">
       <p className="text-label font-medium uppercase text-muted">{item.label}</p>
       <p className="mt-tight font-serif text-h2-m text-ink md:text-h2">
-        {item.format === 'rate' ? metric(item.current * 100, '%') : metric(item.current)}
+        {item.format === 'rate'
+          ? metric(item.current * 100, '%')
+          : item.format === 'duration' ? duration(item.current) : metric(item.current)}
       </p>
       <p className={`mt-tight text-caption ${item.previous === null ? 'text-muted' : positive ? 'text-accent' : 'text-body'}`}>
         {trendNote(item)}
@@ -166,7 +178,7 @@ export default async function AnalyticsDashboard({ searchParams }: {
           ))}
         </nav>
 
-        <section className="grid gap-tight sm:grid-cols-2 lg:grid-cols-5" aria-label="Key metrics">
+        <section className="grid gap-tight sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6" aria-label="Key metrics">
           {overview.headline.map((item) => <MetricCard key={item.key} item={item} />)}
         </section>
 
@@ -205,6 +217,59 @@ export default async function AnalyticsDashboard({ searchParams }: {
                 </div>
               ))}
             </div>
+          </Panel>
+        </section>
+
+        <section>
+          <Panel
+            eyebrow="Attention quality"
+            title="How much focused time the page earns"
+            note="Engaged time counts only while the page is visible and the visitor has shown activity within the last 30 seconds. Rates below use timed sessions as their denominator."
+          >
+            {overview.engagement.timedSessions ? (
+              <div>
+                <div className="grid gap-tight sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    ['Average', duration(overview.engagement.averageMs), `across ${overview.engagement.timedSessions} timed sessions`],
+                    ['Median', duration(overview.engagement.medianMs), 'less distorted by unusually long visits'],
+                    ['Engaged 10s+', metric(overview.engagement.engagementRate * 100, '%'), `${overview.engagement.engagedSessions} of ${overview.engagement.timedSessions} timed sessions`],
+                    ['Deep readers 60s+', metric(overview.engagement.deepRate * 100, '%'), `${overview.engagement.deepSessions} of ${overview.engagement.timedSessions} timed sessions`],
+                  ].map(([label, value, detail]) => (
+                    <div key={label} className="border-l border-line-gold pl-tight">
+                      <p className="text-micro font-medium uppercase text-muted">{label}</p>
+                      <p className="mt-[5px] tnum text-h3 text-ink">{value}</p>
+                      <p className="mt-[3px] text-caption text-muted">{detail}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-flow border-t border-line pt-flow">
+                  <div className="flex flex-wrap items-baseline justify-between gap-tight">
+                    <p className="text-label font-medium uppercase text-muted">Where active attention accumulates</p>
+                    <p className="text-caption text-muted">
+                      Timing coverage: {overview.engagement.timedSessions} of {overview.sessions} sessions
+                      {overview.sessions ? ` · ${metric(overview.engagement.timedSessions / overview.sessions * 100, '%')}` : ''}
+                    </p>
+                  </div>
+                  <div className="mt-tight grid gap-tight md:grid-cols-2">
+                    {overview.engagement.sections.map((row) => (
+                      <div key={row.label} className="rounded border border-line-soft bg-sunken px-[12px] py-[10px]">
+                        <div className="flex items-baseline justify-between gap-tight text-s">
+                          <span className="truncate text-body">{readable(row.label)}</span>
+                          <span className="shrink-0 tnum text-ink">{duration(row.averageMs)} avg · {row.sessions}</span>
+                        </div>
+                        <div className="mt-[7px] h-[3px] overflow-hidden bg-line-soft">
+                          <div className="h-full bg-accent" style={{ width: `${Math.max(row.share * 100, 1)}%` }} />
+                        </div>
+                        <p className="mt-[4px] text-caption text-muted">{metric(row.share * 100, '%')} of recorded active time</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-s text-muted">No engaged-time samples in this window yet. Collection begins with this release.</p>
+            )}
           </Panel>
         </section>
 

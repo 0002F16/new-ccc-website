@@ -62,6 +62,14 @@ export const analyticsBatchSchema = z.object({
     if (event.name === 'section_view' && !event.sectionId) {
       context.addIssue({ code: 'custom', path: ['events', index, 'sectionId'], message: 'Section view requires sectionId' })
     }
+    if (event.name === 'engaged_time' && (
+      !event.sectionId || event.value === undefined || event.value < 1 || event.value > 60_000
+    )) {
+      context.addIssue({
+        code: 'custom', path: ['events', index],
+        message: 'Engaged time requires a section and a duration between 1 and 60000ms',
+      })
+    }
     if ([
       'cta_click', 'faq_open', 'video_start', 'dead_click', 'hesitation',
       'application_submit_attempted', 'application_validation_failed',

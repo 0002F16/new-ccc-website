@@ -173,7 +173,7 @@ export type DashboardMetric = {
   label: string
   current: number
   previous: number | null
-  format: 'count' | 'rate'
+  format: 'count' | 'rate' | 'duration'
 }
 
 export function dashboardMetricDelta(item: DashboardMetric) {
@@ -217,6 +217,25 @@ export type DashboardVital = {
   samples: number
 }
 
+export type DashboardEngagementSection = {
+  label: string
+  sessions: number
+  averageMs: number
+  totalMs: number
+  share: number
+}
+
+export type DashboardEngagement = {
+  averageMs: number
+  medianMs: number
+  timedSessions: number
+  engagedSessions: number
+  engagementRate: number
+  deepSessions: number
+  deepRate: number
+  sections: DashboardEngagementSection[]
+}
+
 export type DashboardOverview = {
   sessions: number
   headline: DashboardMetric[]
@@ -226,6 +245,7 @@ export type DashboardOverview = {
   sections: DashboardSectionRow[]
   devices: DashboardConversionRow[]
   vitals: DashboardVital[]
+  engagement: DashboardEngagement
   formFriction: { label: string; detail?: string; sessions: number }[]
   behavior: { label: string; sessions: number }[]
 }
@@ -238,7 +258,12 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
   if (!databaseConfigured()) {
     return {
       sessions: 0, headline: [], funnel: [], sources: [], geography: [], sections: [],
-      devices: [], vitals: [], formFriction: [], behavior: [],
+      devices: [], vitals: [],
+      engagement: {
+        averageMs: 0, medianMs: 0, timedSessions: 0, engagedSessions: 0,
+        engagementRate: 0, deepSessions: 0, deepRate: 0, sections: [],
+      },
+      formFriction: [], behavior: [],
     }
   }
   const since = Math.max(1, Math.min(days, 90))
@@ -247,7 +272,10 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
     submit_attempted: string; applications: string
   }
   const eventWindow = `now() - ($1 || ' days')::interval`
-  const [totals, previousDaily, sources, rawGeo, sectionCounts, devices, vitals, formFriction, behavior] = await Promise.all([
+  const [
+    totals, previousDaily, sources, rawGeo, sectionCounts, devices, vitals,
+    formFriction, behavior, engagement, previousEngagement, sectionEngagement,
+  ] = await Promise.all([
     query<Totals>(
       `WITH flags AS (
          SELECT s.session_id,
@@ -339,6 +367,46 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
          AND occurred_at >= ${eventWindow}
        GROUP BY event_name ORDER BY event_name`, [since],
     ),
+    query<{
+      timed_sessions: string
+      total_ms: string
+      average_ms: number
+      median_ms: number
+      engaged_sessions: string
+      deep_sessions: string
+    }>(
+      `WITH per_session AS (
+         SELECT s.session_id, sum(e.numeric_value)::float8 engaged_ms
+         FROM analytics_sessions s
+         JOIN analytics_events e ON e.session_id = s.session_id
+           AND e.event_name = 'engaged_time' AND e.occurred_at >= ${eventWindow}
+         WHERE s.started_at >= ${eventWindow}
+         GROUP BY s.session_id
+       )
+       SELECT count(*)::text timed_sessions,
+         coalesce(sum(engaged_ms), 0)::text total_ms,
+         coalesce(avg(engaged_ms), 0)::float8 average_ms,
+         coalesce(percentile_cont(0.5) WITHIN GROUP (ORDER BY engaged_ms), 0)::float8 median_ms,
+         count(*) FILTER (WHERE engaged_ms >= 10000)::text engaged_sessions,
+         count(*) FILTER (WHERE engaged_ms >= 60000)::text deep_sessions
+       FROM per_session`, [since],
+    ),
+    query<{ total_ms: string; timed_sessions: string }>(
+      `SELECT coalesce(sum(total_engaged_ms), 0)::text total_ms,
+         coalesce(sum(timed_sessions), 0)::text timed_sessions
+       FROM analytics_engagement_daily
+       WHERE day >= current_date - ($1 * 2) AND day < current_date - $1`, [since],
+    ),
+    query<{ label: string; sessions: string; total_ms: string }>(
+      `SELECT coalesce(e.section_id, 'page') label,
+         count(DISTINCT e.session_id)::text sessions,
+         coalesce(sum(e.numeric_value), 0)::text total_ms
+       FROM analytics_events e
+       JOIN analytics_sessions s ON s.session_id = e.session_id
+       WHERE e.event_name = 'engaged_time'
+         AND e.occurred_at >= ${eventWindow} AND s.started_at >= ${eventWindow}
+       GROUP BY 1 ORDER BY sum(e.numeric_value) DESC LIMIT 8`, [since],
+    ),
   ])
 
   const total = totals.rows[0] || {
@@ -361,6 +429,19 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
   const previousApplications = previousValue('application_submitted')
   const applicationRate = current.sessions ? current.applications / current.sessions : 0
   const previousRate = previousSessions && previousApplications !== null ? previousApplications / previousSessions : null
+  const engagementRow = engagement.rows[0] || {
+    timed_sessions: '0', total_ms: '0', average_ms: 0, median_ms: 0,
+    engaged_sessions: '0', deep_sessions: '0',
+  }
+  const timedSessions = number(engagementRow.timed_sessions)
+  const totalEngagedMs = number(engagementRow.total_ms)
+  const engagedSessions = number(engagementRow.engaged_sessions)
+  const deepSessions = number(engagementRow.deep_sessions)
+  const previousEngagementRow = previousEngagement.rows[0]
+  const previousTimedSessions = number(previousEngagementRow?.timed_sessions)
+  const previousAverageEngagedMs = previousTimedSessions
+    ? number(previousEngagementRow?.total_ms) / previousTimedSessions
+    : null
 
   const funnelValues = [
     ['sessions', 'Sessions', current.sessions],
@@ -392,6 +473,7 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
       { key: 'application-started', label: 'Application starts', current: current.applicationStarted, previous: previousValue('application_started'), format: 'count' },
       { key: 'applications', label: 'Applications', current: current.applications, previous: previousApplications, format: 'count' },
       { key: 'application-rate', label: 'Application rate', current: applicationRate, previous: previousRate, format: 'rate' },
+      { key: 'engaged-time', label: 'Avg engaged time', current: number(engagementRow.average_ms), previous: previousAverageEngagedMs, format: 'duration' },
     ],
     funnel: funnelValues.map(([key, label, count], index) => ({
       key,
@@ -413,6 +495,26 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
       return { label: row.label, sessions, applications, rate: sessions ? applications / sessions : 0 }
     }),
     vitals: vitals.rows.map((row) => ({ label: row.label, value: number(row.value), samples: number(row.samples) })),
+    engagement: {
+      averageMs: number(engagementRow.average_ms),
+      medianMs: number(engagementRow.median_ms),
+      timedSessions,
+      engagedSessions,
+      engagementRate: timedSessions ? engagedSessions / timedSessions : 0,
+      deepSessions,
+      deepRate: timedSessions ? deepSessions / timedSessions : 0,
+      sections: sectionEngagement.rows.map((row) => {
+        const sessions = number(row.sessions)
+        const totalMs = number(row.total_ms)
+        return {
+          label: row.label,
+          sessions,
+          totalMs,
+          averageMs: sessions ? totalMs / sessions : 0,
+          share: totalEngagedMs ? totalMs / totalEngagedMs : 0,
+        }
+      }),
+    },
     formFriction: formFriction.rows.map((row) => ({ label: row.label, detail: row.detail, sessions: number(row.sessions) })),
     behavior: behavior.rows.map((row) => ({ label: row.label, sessions: number(row.sessions) })),
   }

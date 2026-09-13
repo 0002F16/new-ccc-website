@@ -47,6 +47,29 @@ try {
     WHERE updated_at >= current_date - 3
     GROUP BY 1,2,3,4,5,6,7,8,9
   `)
+  await pool.query(`DELETE FROM analytics_engagement_daily WHERE day >= current_date - 3`)
+  await pool.query(`
+    INSERT INTO analytics_engagement_daily (
+      day, total_engaged_ms, timed_sessions, engaged_sessions, deep_sessions
+    )
+    WITH per_session AS (
+      SELECT
+        (e.occurred_at AT TIME ZONE 'Europe/Warsaw')::date day,
+        e.session_id,
+        sum(e.numeric_value)::bigint engaged_ms
+      FROM analytics_events e
+      WHERE e.event_name = 'engaged_time'
+        AND e.occurred_at >= current_date - 3
+      GROUP BY 1,2
+    )
+    SELECT day,
+      sum(engaged_ms),
+      count(*),
+      count(*) FILTER (WHERE engaged_ms >= 10000),
+      count(*) FILTER (WHERE engaged_ms >= 60000)
+    FROM per_session
+    GROUP BY day
+  `)
   await pool.query(`DELETE FROM analytics_heatmap_bins WHERE updated_at < now() - interval '30 days'`)
   await pool.query(`DELETE FROM analytics_events WHERE occurred_at < now() - interval '90 days'`)
   await pool.query(`DELETE FROM analytics_batches WHERE received_at < now() - interval '90 days'`)
@@ -55,6 +78,7 @@ try {
   await pool.query(`DELETE FROM analytics_visitors WHERE last_seen_at < now() - interval '90 days'`)
   await pool.query(`DELETE FROM analytics_daily WHERE day < current_date - interval '24 months'`)
   await pool.query(`DELETE FROM analytics_heatmap_daily WHERE day < current_date - interval '24 months'`)
+  await pool.query(`DELETE FROM analytics_engagement_daily WHERE day < current_date - interval '24 months'`)
   await pool.query('COMMIT')
   await pool.query('ANALYZE')
   process.stdout.write('Analytics aggregation and retention complete.\n')

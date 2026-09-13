@@ -24,6 +24,10 @@ import {
   type ExpectedOutcome,
   type Point,
 } from '@/lib/analytics/behavior'
+import {
+  engagedTimeIncrement,
+  ENGAGEMENT_EVENT_MINIMUM_MS,
+} from '@/lib/analytics/engagement'
 
 declare global {
   interface Window { __cccAnalyticsMounted?: boolean }
@@ -88,6 +92,10 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     let flushTimer: number | undefined
     let lastMoveAt = 0
     let lastHeatmapAt = 0
+    let lastActivityAt = performance.now()
+    let lastEngagementSampleAt = lastActivityAt
+    let pageWasVisible = document.visibilityState === 'visible'
+    const engagedBySection = new Map<string, number>()
     let disposed = false
     let ragePoints: Point[] = []
     let hesitation: { element: HTMLElement; started: number; x: number; y: number; moved: number; clicked: boolean } | null = null
@@ -95,9 +103,43 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     const push = (
       name: AnalyticsEventName,
       detail: Omit<AnalyticsEvent, 'id' | 'name' | 'timestamp'> = {},
+      flushWhenFull = true,
     ) => {
       events.push({ id: crypto.randomUUID(), name, timestamp: Date.now(), ...detail })
-      if (events.length >= 20) void flush(false)
+      if (flushWhenFull && events.length >= 20) void flush(false)
+    }
+
+    const focusedSection = () => {
+      const element = document.elementFromPoint(
+        Math.max(0, Math.min(window.innerWidth - 1, window.innerWidth / 2)),
+        Math.max(0, Math.min(window.innerHeight - 1, window.innerHeight / 2)),
+      )
+      return element?.closest<HTMLElement>('main section[id]')?.id || 'page'
+    }
+
+    const sampleEngagement = () => {
+      const now = performance.now()
+      const increment = engagedTimeIncrement({
+        wasVisible: pageWasVisible,
+        lastActivityAt,
+        previousSampleAt: lastEngagementSampleAt,
+        now,
+      })
+      if (increment > 0) {
+        const sectionId = focusedSection()
+        engagedBySection.set(sectionId, (engagedBySection.get(sectionId) || 0) + increment)
+      }
+      lastEngagementSampleAt = now
+      pageWasVisible = document.visibilityState === 'visible'
+    }
+
+    const commitEngagement = () => {
+      sampleEngagement()
+      for (const [sectionId, duration] of engagedBySection) {
+        if (duration < ENGAGEMENT_EVENT_MINIMUM_MS) continue
+        push('engaged_time', { sectionId, value: Math.min(60_000, Math.round(duration)) }, false)
+      }
+      engagedBySection.clear()
     }
 
     const onClientAnalytics = (event: Event) => {
@@ -130,6 +172,7 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     }
 
     const makeBatch = (): AnalyticsBatch | null => {
+      commitEngagement()
       if (!events.length && !bins.size) return null
       let heatmap = Array.from(bins.values())
       while (byteLength(JSON.stringify(heatmap)) > MAX_HEATMAP_BYTES && heatmap.length) heatmap = heatmap.slice(0, -1)
@@ -177,6 +220,7 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
 
     const onPointerMove = (event: PointerEvent) => {
       const now = performance.now()
+      lastActivityAt = now
       if (hesitation) {
         const distance = Math.hypot(event.clientX - hesitation.x, event.clientY - hesitation.y)
         hesitation.moved = Math.max(hesitation.moved, distance)
@@ -224,6 +268,7 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     }
 
     const onClick = (event: MouseEvent) => {
+      lastActivityAt = performance.now()
       const element = analyticsElement(event.target)
       if (!element) return
       if (hesitation?.element === element) hesitation.clicked = true
@@ -277,6 +322,15 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     document.addEventListener('pointerout', onPointerOut, { passive: true })
     document.addEventListener('pointerup', onPointerUp, { passive: true })
     document.addEventListener('click', onClick, true)
+    const onActivity = () => { lastActivityAt = performance.now() }
+    const onVisibilityChange = () => {
+      sampleEngagement()
+      if (document.visibilityState === 'visible') lastActivityAt = performance.now()
+    }
+    document.addEventListener('scroll', onActivity, { passive: true })
+    document.addEventListener('keydown', onActivity, { passive: true })
+    document.addEventListener('touchstart', onActivity, { passive: true })
+    document.addEventListener('visibilitychange', onVisibilityChange)
     window.addEventListener(ANALYTICS_CLIENT_EVENT, onClientAnalytics)
     const onPageHide = () => void flush(true)
     window.addEventListener('pagehide', onPageHide)
@@ -291,6 +345,10 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
       document.removeEventListener('pointerout', onPointerOut)
       document.removeEventListener('pointerup', onPointerUp)
       document.removeEventListener('click', onClick, true)
+      document.removeEventListener('scroll', onActivity)
+      document.removeEventListener('keydown', onActivity)
+      document.removeEventListener('touchstart', onActivity)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       window.removeEventListener(ANALYTICS_CLIENT_EVENT, onClientAnalytics)
       window.removeEventListener('pagehide', onPageHide)
       void flush(true)

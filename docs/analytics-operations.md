@@ -7,6 +7,13 @@ addresses, user-agent strings, or ordered mouse trails belong in the analytics
 database. Country and subdivision are resolved locally; low-volume regions are
 grouped in the dashboard.
 
+Engaged time is conservative active attention, not wall-clock session length.
+It accumulates only while the page is visible and activity has occurred within
+the last 30 seconds. The dashboard reports average and median time, the share of
+timed sessions reaching 10 seconds, the share reaching 60 seconds, and coarse
+section-level totals. No typed text, field value, or ordered activity trail is
+included in timing events.
+
 ## First VPS installation
 
 1. Install Node.js 22, PostgreSQL, Nginx, PM2, `certbot`, `pg_dump`, and
