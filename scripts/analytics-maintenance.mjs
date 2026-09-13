@@ -54,7 +54,7 @@ try {
     )
     WITH per_session AS (
       SELECT
-        (e.occurred_at AT TIME ZONE 'Europe/Warsaw')::date day,
+        (e.occurred_at AT TIME ZONE 'Europe/Warsaw')::date AS aggregate_day,
         e.session_id,
         sum(e.numeric_value)::bigint engaged_ms
       FROM analytics_events e
@@ -62,13 +62,13 @@ try {
         AND e.occurred_at >= current_date - 3
       GROUP BY 1,2
     )
-    SELECT day,
+    SELECT aggregate_day,
       sum(engaged_ms),
       count(*),
       count(*) FILTER (WHERE engaged_ms >= 10000),
       count(*) FILTER (WHERE engaged_ms >= 60000)
     FROM per_session
-    GROUP BY day
+    GROUP BY aggregate_day
   `)
   await pool.query(`DELETE FROM analytics_heatmap_bins WHERE updated_at < now() - interval '30 days'`)
   await pool.query(`DELETE FROM analytics_events WHERE occurred_at < now() - interval '90 days'`)
