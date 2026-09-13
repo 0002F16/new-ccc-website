@@ -98,7 +98,7 @@ export default async function EmailSetup({
               </Panel>
 
               {KINDS.map(({ kind, title, when }) => (
-                <Panel key={kind} title={title} note={`${when} Use {firstName} or {fullName}. A blank line starts a new paragraph.`}>
+                <Panel key={kind} title={title} note={`${when} Use {firstName} or {fullName}. A blank line starts a new paragraph, **text** is bold and pasted links are clickable.`}>
                   <label className={label}>
                     Subject
                     <input name={`${kind}_subject`} defaultValue={loaded.settings.templates[kind].subject} required className={input} />

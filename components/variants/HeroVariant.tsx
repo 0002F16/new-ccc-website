@@ -7,11 +7,11 @@ import {
   Gold,
   Label,
   Lede,
-  LoomEmbed,
   Reveal,
   Section,
   Stack,
   StatRow,
+  VideoEmbed,
   type Chip,
   type Stat,
 } from '@/components/ui'
@@ -24,7 +24,7 @@ const stats: Stat[] = [
   { figure: '40–60 days', label: 'Average time to dream job offer' },
 ]
 
-const LOOM_ID = 'ee574d181bb7444e84884afa81a9bc58'
+const YOUTUBE_ID = 'QpElUNDrkTc'
 
 const clientAvatars = [
   {
@@ -190,10 +190,11 @@ function VideoFirstHero({ variant }: { variant: HeroVariant }) {
         {variant.showVideo && (
           <Reveal delay={0.12} className="mx-auto w-full max-w-structure">
             <div className="flex flex-col gap-tight">
-              <LoomEmbed
-                id={LOOM_ID}
-                title="How Capital Career Club runs an end-to-end job-search campaign"
-                eager={variant.preloadVideo}
+              <VideoEmbed
+                id={YOUTUBE_ID}
+                title="How to Get a zl20k/mo Job in 60 Days in Poland"
+                poster="max"
+                priority={variant.preloadVideo}
               />
               {variant.videoCaption && (
                 <p className="text-center text-caption text-muted">{variant.videoCaption}</p>
@@ -272,10 +273,11 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
         {variant.showVideo && (
           <Reveal delay={0.2} className="mx-auto w-full max-w-structure">
             <div className="flex flex-col gap-tight">
-              <LoomEmbed
-                id={LOOM_ID}
-                title="How Capital Career Club runs an end-to-end job-search campaign"
-                eager={variant.preloadVideo}
+              <VideoEmbed
+                id={YOUTUBE_ID}
+                title="How to Get a zl20k/mo Job in 60 Days in Poland"
+                poster="max"
+                priority={variant.preloadVideo}
               />
               {variant.videoCaption && (
                 <p className="text-center text-caption text-muted">{variant.videoCaption}</p>

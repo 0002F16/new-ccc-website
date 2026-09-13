@@ -23,12 +23,14 @@ function VideoPoster({
   control,
   interactive = false,
   loading = false,
+  priority = false,
   onError,
 }: {
   src: string
   control: Control
   interactive?: boolean
   loading?: boolean
+  priority?: boolean
   onError: () => void
 }) {
   return (
@@ -37,7 +39,8 @@ function VideoPoster({
       <img
         src={src}
         alt=""
-        loading="lazy"
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
         decoding="async"
         onError={onError}
         className={cx(
@@ -108,12 +111,15 @@ export function VideoEmbed({
   title,
   control = 'accent',
   poster = 'hq',
+  priority = false,
   className,
 }: {
   id: string
   title: string
   control?: Control
   poster?: PosterQuality
+  /** Load the poster eagerly and at high priority — for a video visible on arrival (e.g. the hero), never for a below-the-fold or grid tile. */
+  priority?: boolean
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
@@ -160,6 +166,7 @@ export function VideoEmbed({
               src={posterSrc}
               control={control}
               loading
+              priority={priority}
               onError={nextPoster}
             />
           </div>
@@ -187,6 +194,7 @@ export function VideoEmbed({
             src={posterSrc}
             control={control}
             interactive
+            priority={priority}
             onError={nextPoster}
           />
         </button>

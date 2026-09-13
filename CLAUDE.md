@@ -955,6 +955,17 @@ new page only, existing site untouched. Consequence: the two surfaces contradict
 each other, and "180+ Internationals Placed in Poland" is the most load-bearing
 sentence for the KRAZ question while that question is open.
 
+- **The hero now embeds `https://youtu.be/QpElUNDrkTc`** — "How to Get a
+  zl20k/mo Job in 60 Days in Poland" (Aziz Khaitov). This is the same video
+  `06-video.tsx` still tracks as blocked: its own title states a salary figure
+  and a guaranteed timeline, both forbidden by the claim rules, and the section
+  comment there is explicit that embedding it "makes the page carry whatever
+  the video asserts" wherever it appears. Owner's call, 13 September 2026:
+  proceed with the real title, not a re-captioned one, and override the block
+  for the hero specifically. This does **not** clear the claims audit that
+  `06-video.tsx` is still waiting on — it means the salary/timeline claims are
+  now live on the page regardless of that audit's outcome.
+
 **Needed before launch, not before drafting**
 
 - VSL title, runtime, and whether its claims match the offer letter.
