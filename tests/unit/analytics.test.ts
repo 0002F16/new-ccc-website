@@ -1,7 +1,15 @@
+import { readFileSync } from 'node:fs'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { NextRequest } from 'next/server'
-import { expectedOutcomeSucceeded, heatmapCell, isHesitation, rageCluster } from '@/lib/analytics/behavior'
-import { assignExperiment, EXPERIMENT_REGISTRY } from '@/lib/analytics/experiments'
+import { expectedOutcomeSucceeded, heatmapCell, isHesitation, rageCluster, sectionCountsAsViewed } from '@/lib/analytics/behavior'
+import {
+  assignExperiment,
+  EXPERIMENT_REGISTRY,
+  experimentHeroCopy,
+  experimentHeroLayout,
+  experimentOutcomesOrder,
+  getExperimentDefinition,
+} from '@/lib/analytics/experiments'
 import { sanitizeAttribution, sanitizePath } from '@/lib/analytics/privacy'
 import { deterministicBucket, signIdentifier, verifyIdentifier } from '@/lib/analytics/signing'
 import { compareConversions, experimentVerdict, wilsonInterval } from '@/lib/analytics/statistics'
@@ -227,7 +235,72 @@ describe('signed identity and assignment', () => {
   })
 })
 
+describe('outcomes order experiment', () => {
+  const definition = getExperimentDefinition('outcomes-videos-first-v1', 1)!
+
+  it('is registered with an outcomes-scoped video conversion', () => {
+    expect(definition.slot).toBe('outcomes.order')
+    expect(definition.primaryEvent).toBe('video_start')
+    expect(definition.primarySection).toBe('outcomes')
+  })
+
+  it('maps arms to an order and never leaks into the hero copy', () => {
+    const control = { experimentId: definition.id, version: 1, variantKey: 'control' as const }
+    const treatment = { ...control, variantKey: 'treatment' as const }
+    expect(experimentOutcomesOrder(definition, control)).toBe('wall-first')
+    expect(experimentOutcomesOrder(definition, treatment)).toBe('videos-first')
+    expect(experimentOutcomesOrder(null, null)).toBe('wall-first')
+    expect(experimentHeroCopy(definition, treatment)).toBeNull()
+    expect(experimentOutcomesOrder(EXPERIMENT_REGISTRY[0], treatment)).toBe('wall-first')
+  })
+})
+
+describe('hero no-video experiment', () => {
+  const definition = getExperimentDefinition('hero-no-video-v1', 1)!
+
+  it('is registered with a hero-scoped CTA conversion', () => {
+    expect(definition.slot).toBe('hero.layout')
+    expect(definition.primaryEvent).toBe('cta_click')
+    expect(definition.primarySection).toBe('hero')
+  })
+
+  it('maps arms to a layout and never leaks into other slots', () => {
+    const control = { experimentId: definition.id, version: 1, variantKey: 'control' as const }
+    const treatment = { ...control, variantKey: 'treatment' as const }
+    expect(experimentHeroLayout(definition, control)).toBe('video')
+    expect(experimentHeroLayout(definition, treatment)).toBe('no-video')
+    expect(experimentHeroLayout(null, null)).toBe('video')
+    expect(experimentHeroLayout(EXPERIMENT_REGISTRY[0], treatment)).toBe('video')
+    expect(experimentHeroCopy(definition, treatment)).toBeNull()
+    expect(experimentOutcomesOrder(definition, treatment)).toBe('wall-first')
+  })
+})
+
+describe('experiment control script', () => {
+  const source = readFileSync('scripts/experiment.mjs', 'utf8')
+
+  it('can start every registered experiment and nothing else', () => {
+    const ids = [...source.matchAll(/^  '([a-z0-9-]+)': \{$/gm)].map((match) => match[1])
+    expect(ids.sort()).toEqual(EXPERIMENT_REGISTRY.map((definition) => definition.id).sort())
+  })
+
+  it('mirrors each registered name, slot and primary event', () => {
+    for (const definition of EXPERIMENT_REGISTRY) {
+      expect(source).toContain(`name: '${definition.name.replace(/'/g, "\\'")}'`)
+      expect(source).toContain(`slot: '${definition.slot}'`)
+      expect(source).toContain(`primaryEvent: '${definition.primaryEvent}'`)
+    }
+  })
+})
+
 describe('behaviour rules', () => {
+  it('counts short sections at a quarter visible and tall sections once they fill half the viewport', () => {
+    expect(sectionCountsAsViewed(0.25, 200, 800)).toBe(true)
+    expect(sectionCountsAsViewed(0.24, 190, 800)).toBe(false)
+    expect(sectionCountsAsViewed(0.06, 400, 800)).toBe(true)
+    expect(sectionCountsAsViewed(0.05, 399, 800)).toBe(false)
+  })
+
   it('normalizes coordinates to a bounded twenty-by-twenty grid', () => {
     expect(heatmapCell(50, 25, { left: 0, top: 0, width: 100, height: 100 })).toEqual({ x: 10, y: 5 })
     expect(heatmapCell(500, -10, { left: 0, top: 0, width: 100, height: 100 })).toEqual({ x: 19, y: 0 })

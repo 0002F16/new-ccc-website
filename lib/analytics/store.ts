@@ -279,7 +279,7 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
     query<Totals>(
       `WITH flags AS (
          SELECT s.session_id,
-           bool_or(e.event_name = 'cta_click' OR (e.event_name = 'section_view' AND e.section_id IN ('two-situations','apply'))) progressed,
+           bool_or(e.event_name = 'cta_click' OR (e.event_name = 'section_view' AND e.section_id IN ('value-prop','apply'))) progressed,
            bool_or(e.event_name = 'section_view' AND e.section_id = 'apply') apply_reached,
            bool_or(e.event_name = 'application_started') application_started,
            bool_or(e.event_name = 'application_submit_attempted') submit_attempted,
@@ -452,7 +452,7 @@ export async function getDashboardOverview(days: number): Promise<DashboardOverv
     ['application-submitted', 'Application submitted', current.applications],
   ] as const
 
-  const sectionOrder = ['hero', 'two-situations', 'bottlenecks', 'outcomes', 'faq', 'apply']
+  const sectionOrder = ['hero', 'value-prop', 'outcomes', 'faq', 'apply']
   const sectionMap = new Map(sectionCounts.rows.map((row) => [row.label, number(row.sessions)]))
   const sections: DashboardSectionRow[] = sectionOrder.map((label, index) => {
     const count = sectionMap.get(label) || 0
@@ -677,12 +677,18 @@ export async function getStoredExperiments(): Promise<StoredExperiment[]> {
                 JOIN analytics_events e ON e.session_id = s.session_id
                 WHERE s.visitor_id = x.visitor_id
                   AND e.event_name = $3
+                  AND ($4::text IS NULL OR e.section_id = $4)
                   AND e.occurred_at >= x.exposed_at
               ))::text conversions
        FROM analytics_exposures x
        WHERE x.experiment_id = $1 AND x.experiment_version = $2
        GROUP BY x.variant_key`,
-      [experiment.experiment_id, experiment.version, experiment.primary_event],
+      [
+        experiment.experiment_id,
+        experiment.version,
+        experiment.primary_event,
+        getExperimentDefinition(experiment.experiment_id, experiment.version)?.primarySection ?? null,
+      ],
     )
     const control = stats.rows.find((row) => row.variant_key === 'control')
     const treatment = stats.rows.find((row) => row.variant_key === 'treatment')
@@ -694,6 +700,131 @@ export async function getStoredExperiments(): Promise<StoredExperiment[]> {
       treatment_conversions: number(treatment?.conversions),
     })
   }
+  return rows
+}
+
+/**
+ * Per-arm comparison for one experiment. Everything is counted per exposed
+ * visitor, from events at or after that visitor's exposure, exactly as
+ * `getStoredExperiments` counts the primary conversion. One query per arm keeps
+ * the SQL readable; the arms are independent.
+ *
+ * Rate metrics are safe to read as conversion rates (the dashboard puts a
+ * Wilson interval on them). Count and duration metrics are directional only.
+ */
+export type ExperimentComparisonRow = {
+  key: string
+  label: string
+  detail: string
+  format: 'rate' | 'duration'
+  control: { visitors: number; value: number; conversions: number }
+  treatment: { visitors: number; value: number; conversions: number }
+}
+
+type ComparisonArmRow = {
+  visitors: string
+  cta_any: string
+  cta_hero: string
+  application_started: string
+  application_submitted: string
+  reached_apply: string
+  friction: string
+  engaged_seconds: string | null
+}
+
+const COMPARISON_METRICS = [
+  { key: 'cta_any', label: 'Clicked any CTA', detail: 'Share of exposed visitors', column: 'cta_any' },
+  { key: 'cta_hero', label: 'Clicked the hero CTA', detail: 'The experiment’s primary event', column: 'cta_hero' },
+  { key: 'reached_apply', label: 'Reached the form', detail: 'Saw the application section', column: 'reached_apply' },
+  { key: 'application_started', label: 'Started an application', detail: 'Typed into the form', column: 'application_started' },
+  { key: 'application_submitted', label: 'Submitted an application', detail: 'Reached the CRM', column: 'application_submitted' },
+  { key: 'friction', label: 'Hit friction', detail: 'Rage click, dead click or hesitation. Lower is better', column: 'friction' },
+] as const
+
+export async function getExperimentComparison(
+  experimentId: string,
+  version: number,
+): Promise<ExperimentComparisonRow[]> {
+  if (!databaseConfigured()) return []
+  const arms = await Promise.all(
+    (['control', 'treatment'] as const).map(async (arm) => {
+      const result = await query<ComparisonArmRow>(
+        `WITH exposed AS (
+           SELECT x.visitor_id, min(x.exposed_at) exposed_at
+           FROM analytics_exposures x
+           WHERE x.experiment_id = $1 AND x.experiment_version = $2 AND x.variant_key = $3
+           GROUP BY x.visitor_id
+         ),
+         visitor_events AS (
+           SELECT ex.visitor_id, e.event_name, e.section_id, e.numeric_value
+           FROM exposed ex
+           JOIN analytics_sessions s ON s.visitor_id = ex.visitor_id
+           JOIN analytics_events e ON e.session_id = s.session_id
+           WHERE e.occurred_at >= ex.exposed_at
+         )
+         SELECT
+           (SELECT count(*) FROM exposed)::text visitors,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name = 'cta_click')::text cta_any,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name = 'cta_click' AND section_id = 'hero')::text cta_hero,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name = 'application_started')::text application_started,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name = 'application_submitted')::text application_submitted,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name = 'section_view' AND section_id = 'apply')::text reached_apply,
+           count(DISTINCT visitor_id) FILTER (WHERE event_name IN ('rage_click','dead_click','hesitation'))::text friction,
+           (sum(numeric_value) FILTER (WHERE event_name = 'engaged_time'))::text engaged_seconds
+         FROM visitor_events`,
+        [experimentId, version, arm],
+      )
+      const row = result.rows[0]
+      return {
+        visitors: number(row?.visitors),
+        counts: {
+          cta_any: number(row?.cta_any),
+          cta_hero: number(row?.cta_hero),
+          application_started: number(row?.application_started),
+          application_submitted: number(row?.application_submitted),
+          reached_apply: number(row?.reached_apply),
+          friction: number(row?.friction),
+        } as Record<string, number>,
+        engagedSeconds: number(row?.engaged_seconds) / 1000,
+      }
+    }),
+  )
+  const [control, treatment] = arms
+
+  const rows: ExperimentComparisonRow[] = COMPARISON_METRICS.map((metric) => ({
+    key: metric.key,
+    label: metric.label,
+    detail: metric.detail,
+    format: 'rate' as const,
+    control: {
+      visitors: control.visitors,
+      conversions: control.counts[metric.column],
+      value: control.visitors ? control.counts[metric.column] / control.visitors : 0,
+    },
+    treatment: {
+      visitors: treatment.visitors,
+      conversions: treatment.counts[metric.column],
+      value: treatment.visitors ? treatment.counts[metric.column] / treatment.visitors : 0,
+    },
+  }))
+
+  rows.push({
+    key: 'engaged_time',
+    label: 'Engaged time per visitor',
+    detail: 'Active attention, directional only',
+    format: 'duration',
+    control: {
+      visitors: control.visitors,
+      conversions: 0,
+      value: control.visitors ? control.engagedSeconds / control.visitors : 0,
+    },
+    treatment: {
+      visitors: treatment.visitors,
+      conversions: 0,
+      value: treatment.visitors ? treatment.engagedSeconds / treatment.visitors : 0,
+    },
+  })
+
   return rows
 }
 

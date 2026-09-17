@@ -1,7 +1,12 @@
 import { LandingPage } from '@/components/variants/LandingPage'
-import { getHeroVariant } from '@/components/variants/hero-variants'
+import { getHeroVariant, getNoVideoVariant } from '@/components/variants/hero-variants'
 import { headers } from 'next/headers'
-import { assignExperiment, experimentHeroCopy } from '@/lib/analytics/experiments'
+import {
+  assignExperiment,
+  experimentHeroCopy,
+  experimentHeroLayout,
+  experimentOutcomesOrder,
+} from '@/lib/analytics/experiments'
 import { getActiveHomepageExperiment } from '@/lib/analytics/store'
 import { isHeatmapSample } from '@/lib/analytics/signing'
 import { databaseConfigured } from '@/lib/db'
@@ -15,7 +20,12 @@ import { databaseConfigured } from '@/lib/db'
  * resolves. 21-apply supersedes it once counsel's privacy notice and a
  * confirmed booking URL land.
  *
+ * 17 September 2026: 02-value-prop-scroll (placeholder) replaces
+ * 02-two-situations and 04-three-bottlenecks on the page.
+ *
  * Uncomposed, files kept on disk:
+ *   02-two-situations    replaced by 02-value-prop-scroll
+ *   04-three-bottlenecks replaced by 02-value-prop-scroll
  *   03-what-this-is     cut — removed from the shared page by owner
  *   05-three-routes      cut — every claim in it is made elsewhere
  *   06-video             cut — the VSL is blocked on its claims audit
@@ -44,14 +54,20 @@ export default async function Page() {
   const definition = trackingEnabled && databaseConfigured() ? await getActiveHomepageExperiment() : null
   const experiment = assignExperiment(visitorId, definition)
   const heroCopy = experimentHeroCopy(definition, experiment)
+  const outcomesOrder = experimentOutcomesOrder(definition, experiment)
   const baseVariant = getHeroVariant('working')!
-  const variant = heroCopy
+  const copiedVariant = heroCopy
     ? { ...baseVariant, headline: heroCopy.headline, accentPhrase: heroCopy.accentPhrase }
     : baseVariant
+  const variant =
+    experimentHeroLayout(definition, experiment) === 'no-video'
+      ? getNoVideoVariant()
+      : copiedVariant
 
   return (
     <LandingPage
       variant={variant}
+      outcomesOrder={outcomesOrder}
       analytics={{
         enabled: trackingEnabled,
         heatmapSample: Boolean(sessionId && isHeatmapSample(sessionId)),

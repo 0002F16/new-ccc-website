@@ -28,7 +28,7 @@ export function StatRow({
   return (
     <dl
       className={cx(
-        'flex flex-col items-center divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0',
+        'flex flex-col items-center divide-y divide-line md:flex-row md:divide-x md:divide-y-0',
         className,
       )}
       {...rest}
@@ -36,7 +36,7 @@ export function StatRow({
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="flex flex-col-reverse items-center gap-tight px-0 py-flow-m text-center sm:flex-1 sm:px-flow sm:py-0 md:px-card"
+          className="flex flex-col-reverse items-center gap-tight px-0 py-flow-m text-center md:flex-1 md:px-flow md:py-0 lg:px-card"
         >
           {/* Column order is figure-over-label; DOM order is label-then-figure so
               the <dl> stays a real term/description pair. */}

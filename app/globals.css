@@ -31,6 +31,54 @@
 }
 
 @layer components {
+  /* No-video hero (owner override, 17 September 2026). Each headline line sits
+     in a mask and rises into it once on load. The padding keeps descenders and
+     italic overhang inside the mask; the negative margin cancels it in layout.
+     The animation always ends in place, and reduced motion removes it. */
+  .hero-mask {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.12em 0.14em 0;
+    margin: 0 -0.12em -0.14em 0;
+  }
+  .hero-mask > span {
+    display: block;
+    animation: hero-mask-rise 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes hero-mask-rise {
+    from {
+      transform: translateY(108%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  /* Large metrics under the no-video hero. `BigStats` arms only blocks not yet
+     half on screen, after hydration; each rises 100px once. The easing is a
+     damped spring (ratio 0.68, natural frequency 6 rad/s) sampled into
+     linear(), fitted to Bending Spoons' measured stats animation: about 6%
+     overshoot on position and opacity, settled by 1.2s. */
+  .big-stat[data-armed] {
+    --big-stat-spring: linear(0, 0.022 3.1%, 0.08 6.2%, 0.161 9.4%, 0.256 12.5%, 0.358 15.6%, 0.461 18.8%, 0.56 21.9%, 0.651 25%, 0.733 28.1%, 0.806 31.2%, 0.867 34.4%, 0.919 37.5%, 0.96 40.6%, 0.992 43.8%, 1.016 46.9%, 1.034 50%, 1.045 53.1%, 1.051 56.2%, 1.054 59.4%, 1.054 62.5%, 1.051 65.6%, 1.047 68.8%, 1.042 71.9%, 1.037 75%, 1.031 78.1%, 1.026 81.2%, 1.021 84.4%, 1.016 87.5%, 1.012 90.6%, 1.008 93.8%, 1.005 96.9%, 1);
+    transition:
+      transform 1200ms var(--big-stat-spring),
+      opacity 1200ms var(--big-stat-spring);
+  }
+  .big-stat[data-armed]:not([data-in]) {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  /* Film grain over the hero only: static SVG noise, never animated. */
+  .hero-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   /* Entry: fades and rises 8px. `both` holds the start state through the
      stagger delay; the animation always ends visible, and the reduced-motion
      block below collapses it to effectively instant. */
@@ -156,7 +204,9 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   /* Belt and braces: never leave a revealed block mid-animation. */
-  [data-reveal] {
+  [data-reveal],
+  .hero-mask > span,
+  .big-stat {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

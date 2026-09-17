@@ -594,7 +594,7 @@ it does not say what the answer will be.
 ### Stat row
 Added 9 September 2026. Headline proof above the hero `h1`. Figure in `ink` at
 `h3` with tabular numerals, label beneath in `muted` small caps, items divided by
-a vertical `line` hairline, centred; stacks below `sm` with the rule turning
+a vertical `line` hairline, centred; stacks below `md` with the rule turning
 horizontal. No fill, no card, no gold — the hero's accent belongs to the CTA.
 **Never** animate a figure counting up, and never more than one stat row on the
 page.
@@ -691,6 +691,48 @@ forgotten. The rest of the claim rules stand unchanged.
   relaxed: prose may be rewritten for length. Inventing facts is still forbidden.
 - The page's target is **no rendered paragraph over 45 words**, and no
   build-scaffolding caption over 15 words.
+
+## Overridden 17 September 2026
+
+Owner's instruction, for the value-prop scroll section
+(`02-value-prop-scroll.tsx`, a placeholder that replaces sections 2 and 3):
+
+- **Scroll-linked animation is allowed** in this section, modelled on
+  bendingspoons.com. Three paragraphs, each split into characters that start
+  blurred (a 40px `text-shadow`, since `filter` glitches on inline text in
+  Chrome) and transparent. Each paragraph is scrubbed by scroll from its
+  top at 80% of the viewport to about 50%, with a ~14-character eased band and
+  a ~90ms smoothing lag, and it reverses on scroll up. Native scrolling is
+  never intercepted, text renders fully visible without JS, and reduced motion
+  gets static text.
+- **Type far above `display-xl`** is allowed in this section, up to 88px, and
+  the hero's once-per-page rule for `display-xl` does not bind it.
+- **Spacing outside the scale** is allowed in this section: 200px section
+  padding and 100px between paragraphs on desktop, 80px and 56px on mobile.
+- No visible eyebrow or heading; the `h2` is screen-reader only.
+
+And for the **no-video hero variant** (`NoVideoHero`, the treatment arm of
+`hero-no-video-v1`), at the owner's request for a "sleek, modern, Awwwards"
+look:
+
+- Oversized serif headline up to 152px, full-bleed width with a 40px gutter.
+- The accent phrase is italic **and** gold.
+- A static film-grain texture over the hero only.
+- Each headline line rises out of a mask on load over 1100ms, staggered 100ms.
+  It always ends in place and is removed under reduced motion.
+- A hairline meta row at the top and a lede · social proof · CTA row at the
+  bottom, filling one screen.
+- Its own headline, "You have the experience. / Now make it *pay off.*"
+  (18 September 2026), two lines, the accent phrase inline. The homepage keeps
+  its copy, so `hero-no-video-v1` tests the whole hero, not the video alone.
+- The accent phrase is inline on the second line, not on a line of its own.
+- Large metrics below it (`BigStats`), modelled on bendingspoons.com: every
+  stat is a serif gold number up to 185px on its own line, then one sans
+  caption line in ink up to 54px, stacked and centred. Each block rises 100px once, when half of it is on screen,
+  on a spring fitted to Bending Spoons' measured curve (about 6% overshoot,
+  settled by 1.2s). Spacing matches theirs: 104px section padding (64px
+  mobile), 40px per block, 8px from number to caption. Fail-open without JS; static under reduced
+  motion.
 
 ## Motion
 

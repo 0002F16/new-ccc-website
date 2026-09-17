@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "db:migrate": "node scripts/migrate.mjs",
+    "experiment": "node --env-file=.env.local scripts/experiment.mjs",
     "analytics:maintain": "node scripts/analytics-maintenance.mjs",
     "analytics:snapshots": "node scripts/analytics-snapshots.mjs"
   },

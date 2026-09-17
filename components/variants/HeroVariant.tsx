@@ -15,6 +15,7 @@ import {
   type Chip,
   type Stat,
 } from '@/components/ui'
+import { BigStats } from './BigStats'
 import type { HeroVariant } from './hero-variants'
 
 const stats: Stat[] = [
@@ -96,6 +97,17 @@ function ClientAvatarStrip() {
   )
 }
 
+function SocialProofBadge({ proof }: { proof: NonNullable<HeroVariant['socialProof']> }) {
+  return (
+    <div className="flex min-h-[44px] max-w-narrow items-center gap-tight rounded border border-line bg-surface px-[16px] py-[8px] shadow-card">
+      <ClientAvatarStrip />
+      <span className="text-caption text-body">
+        <span className="tnum font-serif text-h4 text-ink">{proof.figure}</span> {proof.label}
+      </span>
+    </div>
+  )
+}
+
 function Highlight({ line, phrase }: { line: string; phrase: string }) {
   const start = line.indexOf(phrase)
   if (start === -1) return line
@@ -110,12 +122,13 @@ function Highlight({ line, phrase }: { line: string; phrase: string }) {
 }
 
 function Headline({ variant }: { variant: HeroVariant }) {
+  const wrapOnMobile = variant.layout === 'baseline' || variant.layout === 'no-video'
   return (
     <Display as="h1" size={variant.headlineSize}>
       {variant.headline.map((line) => (
         <span
           key={line}
-          className={variant.layout === 'baseline' ? 'block md:whitespace-nowrap' : 'block whitespace-nowrap'}
+          className={wrapOnMobile ? 'block md:whitespace-nowrap' : 'block whitespace-nowrap'}
         >
           <Highlight line={line} phrase={variant.accentPhrase} />
         </span>
@@ -238,15 +251,7 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
       <Stack gap="flow" className="items-center">
         {variant.socialProof && (
           <Reveal>
-            <div className="flex min-h-[44px] max-w-narrow items-center gap-tight rounded border border-line bg-surface px-[16px] py-[8px] shadow-card">
-              <ClientAvatarStrip />
-              <span className="text-caption text-body">
-                <span className="tnum font-serif text-h4 text-ink">
-                  {variant.socialProof.figure}
-                </span>{' '}
-                {variant.socialProof.label}
-              </span>
-            </div>
+            <SocialProofBadge proof={variant.socialProof} />
           </Reveal>
         )}
 
@@ -300,8 +305,96 @@ function SocialProofVideoHero({ variant }: { variant: HeroVariant }) {
   )
 }
 
+/** One headline line inside a mask; the inner span rises into view on load. */
+function MaskLine({
+  children,
+  delay,
+  className,
+}: {
+  children: React.ReactNode
+  delay: number
+  className?: string
+}) {
+  return (
+    <span className={`hero-mask ${className ?? ''}`}>
+      <span style={{ animationDelay: `${delay}ms` }}>{children}</span>
+    </span>
+  )
+}
+
+/**
+ * No-video hero, editorial. The treatment arm of `hero-no-video-v1`.
+ * Owner override, 17 September 2026: "sleek, modern, Awwwards". Breaks Gilt on
+ * purpose: type far above `display-xl`, italic and gold together on the accent
+ * phrase, a grain texture, and a masked line reveal longer than 240ms. See
+ * "Overridden 17 September 2026" in CLAUDE.md.
+ *
+ * One full screen, three bands: a hairline meta row, the oversized two-line
+ * headline (accent phrase gold italic, inline), and a bottom row of
+ * lede · social proof · the single CTA. Large Bending Spoons–style metrics
+ * (`BigStats`) follow below the fold.
+ */
+function NoVideoHero({ variant }: { variant: HeroVariant }) {
+  const [first, second] = variant.headline
+  const accentAt = second.indexOf(variant.accentPhrase)
+  const lead = accentAt === -1 ? second : second.slice(0, accentAt)
+  const tail = accentAt === -1 ? '' : second.slice(accentAt + variant.accentPhrase.length)
+
+  return (
+    <section id="hero" className="hero-grain relative isolate px-gutter-m md:px-[40px]">
+      <div className="flex min-h-svh flex-col justify-between gap-block-m py-[20px] md:gap-block md:py-[28px]">
+        <Reveal>
+          <div className="grid grid-cols-2 items-baseline gap-x-flow-m border-b border-line pb-[14px] text-micro font-medium uppercase text-muted md:grid-cols-3">
+            <p className="text-ink">Capital Career Club</p>
+            <p className="text-right md:text-center">For experienced internationals</p>
+            <p className="hidden text-right md:block" aria-hidden>
+              (Scroll)
+            </p>
+          </div>
+        </Reveal>
+
+        <h1 className="font-serif text-[clamp(52px,9.4vw,152px)] font-normal leading-[0.94] tracking-[-0.03em] text-ink">
+          <MaskLine delay={80}>{first}</MaskLine>
+          <MaskLine delay={180}>
+            {lead}
+            {accentAt !== -1 && (
+              <em className="pr-[0.08em] font-serif italic text-accent">{variant.accentPhrase}</em>
+            )}
+            {tail}
+          </MaskLine>
+        </h1>
+
+        <Reveal delay={0.4}>
+          <div className="grid gap-flow-m border-t border-line pt-[20px] md:grid-cols-12 md:items-end md:gap-x-flow md:pt-[24px]">
+            <p className="max-w-[420px] text-s text-body [text-wrap:pretty] md:col-span-5">{variant.lede}</p>
+
+            {variant.socialProof ? (
+              <div className="flex items-center gap-tight md:col-span-3">
+                <ClientAvatarStrip />
+                <p className="text-caption text-body">
+                  <span className="tnum text-ink">{variant.socialProof.figure}</span>{' '}
+                  {variant.socialProof.label}
+                </p>
+              </div>
+            ) : (
+              <div className="hidden md:col-span-3 md:block" />
+            )}
+
+            <div className="md:col-span-4 md:flex md:justify-end [&_a]:w-full md:[&_a]:w-auto">
+              <CtaBlock analyticsId="hero" note={variant.ctaNote} align="left" />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      {variant.showStats !== false && <BigStats />}
+    </section>
+  )
+}
+
 export function HeroVariantView({ variant }: { variant: HeroVariant }) {
   if (variant.layout === 'baseline') return <BaselineHero variant={variant} />
   if (variant.layout === 'social-proof-video') return <SocialProofVideoHero variant={variant} />
+  if (variant.layout === 'no-video') return <NoVideoHero variant={variant} />
   return <VideoFirstHero variant={variant} />
 }

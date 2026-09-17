@@ -40,6 +40,32 @@ test('captures a privacy-minimised page view, UTM attribution, and CTA placement
   expect(sessionCookie!.expires - Date.now() / 1000).toBeGreaterThan(29 * 60)
 })
 
+test('reports a view of the tall outcomes section and keeps the wall first by default', async ({ page }) => {
+  const batches: Record<string, unknown>[] = []
+  await page.route('**/api/analytics/batch', async (route) => {
+    batches.push(route.request().postDataJSON())
+    await route.fulfill({ status: 202, contentType: 'application/json', body: '{"accepted":true}' })
+  })
+  await page.goto('/')
+
+  const order = await page.evaluate(() => {
+    const top = (selector: string) => document.querySelector(`#outcomes ${selector}`)!.getBoundingClientRect().top
+    return top('[aria-label^="View larger:"]') < top('[data-analytics-id^="video-"]') ? 'wall-first' : 'videos-first'
+  })
+  expect(order).toBe('wall-first')
+
+  const outcomes = page.locator('#outcomes')
+  await outcomes.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY))
+  for (let step = 0; step < 4; step += 1) {
+    await page.mouse.wheel(0, 400)
+    await page.waitForTimeout(150)
+  }
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')))
+  await expect.poll(() => batches.flatMap((batch) => (
+    (batch.events as { name: string; sectionId?: string }[] | undefined) || []
+  )).some((event) => event.name === 'section_view' && event.sectionId === 'outcomes')).toBe(true)
+})
+
 test('records the application funnel without recording entered values', async ({ page }) => {
   const batches: Record<string, unknown>[] = []
   await page.route('**/api/analytics/batch', async (route) => {

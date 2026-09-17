@@ -80,17 +80,28 @@ export type AnalyticsBatch = {
   heatmap: HeatmapBin[]
 }
 
-export type ExperimentDefinition = {
+type ExperimentBase = {
   id: string
   version: number
   name: string
   hypothesis: string
   page: 'homepage'
-  slot: 'hero.headline'
   primaryEvent: AnalyticsEventName
+  /** Count a conversion only when the primary event fired in this section. */
+  primarySection?: string
   allocation: { control: 50; treatment: 50 }
-  variants: readonly [
-    { key: 'control'; label: string; value: { headline: readonly [string, string]; accentPhrase: string } },
-    { key: 'treatment'; label: string; value: { headline: readonly [string, string]; accentPhrase: string } },
-  ]
 }
+
+type Arms<Value> = readonly [
+  { key: 'control'; label: string; value: Value },
+  { key: 'treatment'; label: string; value: Value },
+]
+
+export type HeroHeadlineValue = { headline: readonly [string, string]; accentPhrase: string }
+export type OutcomesOrder = 'wall-first' | 'videos-first'
+export type HeroLayout = 'video' | 'no-video'
+
+export type ExperimentDefinition =
+  | (ExperimentBase & { slot: 'hero.headline'; variants: Arms<HeroHeadlineValue> })
+  | (ExperimentBase & { slot: 'outcomes.order'; variants: Arms<{ order: OutcomesOrder }> })
+  | (ExperimentBase & { slot: 'hero.layout'; variants: Arms<{ layout: HeroLayout }> })

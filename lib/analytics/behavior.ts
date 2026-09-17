@@ -37,3 +37,15 @@ export function expectedOutcomeSucceeded(
   if (expected === 'media') return !after.elementPresent
   return after.pageHidden
 }
+
+/** 1% steps to 25%, so a section many viewports tall still reports as it scrolls. */
+export const SECTION_VIEW_THRESHOLDS = Array.from({ length: 26 }, (_, index) => index / 100)
+
+/**
+ * A section counts as viewed once a quarter of it is on screen, or once it
+ * fills half the viewport. The second rule is for sections taller than four
+ * viewports, which can never be a quarter visible.
+ */
+export function sectionCountsAsViewed(intersectionRatio: number, visibleHeight: number, viewportHeight: number) {
+  return intersectionRatio >= 0.25 || (viewportHeight > 0 && visibleHeight >= viewportHeight * 0.5)
+}

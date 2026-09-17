@@ -1,5 +1,5 @@
 export type HeroVariantStatus = 'baseline' | 'in-review' | 'draft' | 'approved'
-export type HeroVariantLayout = 'baseline' | 'video-first' | 'social-proof-video'
+export type HeroVariantLayout = 'baseline' | 'video-first' | 'social-proof-video' | 'no-video'
 export type HeroHeadlineSize = 'xl' | 'compact'
 
 export type HeroQualifier = {
@@ -180,6 +180,27 @@ export const heroVariants = [
     videoCaption: 'See how the team runs the search.',
     stickyLine: 'Your ability, backed by the hours and access a serious search needs.',
   },
+  {
+    id: 'no-video',
+    name: 'No video (legacy structure)',
+    path: '/variants/no-video',
+    hypothesis: 'An editorial no-video hero with a pay-off headline and large metrics raises CTA clicks.',
+    status: 'draft',
+    layout: 'no-video',
+    eyebrow: 'The step-by-step job-search campaign',
+    headline: ['You have the experience.', 'Now make it pay off.'],
+    accentPhrase: 'pay off.',
+    headlineSize: 'xl',
+    lede:
+      'The only end-to-end career engineering system built for internationals in Poland. We rebuild your CV and LinkedIn, run the applications and outreach every week, and get you ready for every interview.',
+    showVideo: false,
+    socialProof: {
+      figure: '200+',
+      label: 'clients have worked with Capital Career Club',
+    },
+    showStats: true,
+    stickyLine: 'Turn your experience into your next role.',
+  },
 ] as const satisfies readonly HeroVariant[]
 
 export type HeroVariantId = (typeof heroVariants)[number]['id']
@@ -217,6 +238,15 @@ export const routedHeroVariants: readonly HeroVariant[] = [
 
 export function getHeroVariant(id: string): HeroVariant | undefined {
   return heroVariants.find((variant) => variant.id === id)
+}
+
+/**
+ * The treatment arm of `hero-no-video-v1`: the registered no-video variant,
+ * with its own headline. The test compares the whole hero (copy, layout and
+ * metrics), so the homepage copy is deliberately not carried across.
+ */
+export function getNoVideoVariant(): HeroVariant {
+  return heroVariants.find((variant) => variant.id === 'no-video')!
 }
 
 export function getRoutedHeroVariant(slug: string): HeroVariant | undefined {

@@ -1,4 +1,4 @@
-import type { ExperimentContext, ExperimentDefinition } from './types'
+import type { ExperimentContext, ExperimentDefinition, HeroHeadlineValue, HeroLayout, OutcomesOrder } from './types'
 import { deterministicBucket } from './signing'
 
 /**
@@ -34,6 +34,36 @@ export const EXPERIMENT_REGISTRY: readonly ExperimentDefinition[] = [
       },
     ],
   },
+  {
+    id: 'outcomes-videos-first-v1',
+    version: 1,
+    name: 'Outcomes: videos before the screenshot wall',
+    hypothesis: 'Putting the filmed testimonials above the screenshot wall gets more visitors to watch one.',
+    page: 'homepage',
+    slot: 'outcomes.order',
+    primaryEvent: 'video_start',
+    primarySection: 'outcomes',
+    allocation: { control: 50, treatment: 50 },
+    variants: [
+      { key: 'control', label: 'Wall first', value: { order: 'wall-first' } },
+      { key: 'treatment', label: 'Videos first', value: { order: 'videos-first' } },
+    ],
+  },
+  {
+    id: 'hero-no-video-v1',
+    version: 1,
+    name: 'Hero: current vs. new (no video, new headline, large metrics)',
+    hypothesis: 'An editorial no-video hero with a pay-off headline and large metrics raises CTA clicks.',
+    page: 'homepage',
+    slot: 'hero.layout',
+    primaryEvent: 'cta_click',
+    primarySection: 'hero',
+    allocation: { control: 50, treatment: 50 },
+    variants: [
+      { key: 'control', label: 'Current hero', value: { layout: 'video' } },
+      { key: 'treatment', label: 'New hero', value: { layout: 'no-video' } },
+    ],
+  },
 ]
 
 export function getExperimentDefinition(id: string, version?: number) {
@@ -56,7 +86,23 @@ export function assignExperiment(
 export function experimentHeroCopy(
   definition: ExperimentDefinition | null,
   context: ExperimentContext,
-): { headline: readonly [string, string]; accentPhrase: string } | null {
-  if (!definition || !context) return null
+): HeroHeadlineValue | null {
+  if (!definition || !context || definition.slot !== 'hero.headline') return null
   return definition.variants.find((variant) => variant.key === context.variantKey)?.value ?? null
+}
+
+export function experimentOutcomesOrder(
+  definition: ExperimentDefinition | null,
+  context: ExperimentContext,
+): OutcomesOrder {
+  if (!definition || !context || definition.slot !== 'outcomes.order') return 'wall-first'
+  return definition.variants.find((variant) => variant.key === context.variantKey)?.value.order ?? 'wall-first'
+}
+
+export function experimentHeroLayout(
+  definition: ExperimentDefinition | null,
+  context: ExperimentContext,
+): HeroLayout {
+  if (!definition || !context || definition.slot !== 'hero.layout') return 'video'
+  return definition.variants.find((variant) => variant.key === context.variantKey)?.value.layout ?? 'video'
 }

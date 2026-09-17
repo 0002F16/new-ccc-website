@@ -5,7 +5,9 @@ import {
   getDashboardHeatmap,
   getDashboardOverview,
   getStoredExperiments,
+  getExperimentComparison,
   dashboardMetricDelta,
+  type ExperimentComparisonRow,
   type DashboardConversionRow,
   type DashboardMetric,
   type DashboardVital,
@@ -17,7 +19,83 @@ import { HeatmapOverlay } from '@/components/analytics/HeatmapOverlay'
 
 export const dynamic = 'force-dynamic'
 
-const SECTIONS = ['hero', 'two-situations', 'bottlenecks', 'outcomes', 'faq', 'apply'] as const
+/**
+ * Per-arm comparison for a running experiment: every metric the arms can be
+ * judged on, not only the primary event. Rate metrics carry a 95% difference
+ * interval; engaged time is directional and says so.
+ */
+function ExperimentComparisonTable({ rows }: { rows: ExperimentComparisonRow[] }) {
+  return (
+    <div className="mt-flow overflow-x-auto border-t border-line pt-flow-m">
+      <table className="w-full min-w-[640px] border-collapse text-left">
+        <caption className="sr-only">Metric comparison by experiment arm</caption>
+        <thead>
+          <tr className="text-label font-medium uppercase text-muted">
+            <th scope="col" className="pb-tight font-medium">Metric</th>
+            <th scope="col" className="pb-tight text-right font-medium">Control</th>
+            <th scope="col" className="pb-tight text-right font-medium">Treatment</th>
+            <th scope="col" className="pb-tight text-right font-medium">Difference</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => {
+            const rate = row.format === 'rate'
+            const control = wilsonInterval(row.control.conversions, row.control.visitors)
+            const treatment = wilsonInterval(row.treatment.conversions, row.treatment.visitors)
+            const comparison = compareConversions(control, treatment)
+            const relative = row.control.value > 0
+              ? (row.treatment.value - row.control.value) / row.control.value
+              : null
+            return (
+              <tr key={row.key} className="border-t border-line-soft align-baseline">
+                <th scope="row" className="py-tight pr-flow-m font-normal">
+                  <span className="block text-s text-ink">{row.label}</span>
+                  <span className="block text-caption text-muted">{row.detail}</span>
+                </th>
+                <td className="py-tight text-right tnum text-s text-body">
+                  {rate
+                    ? `${metric(row.control.value * 100, '%')} (${row.control.conversions})`
+                    : `${metric(row.control.value)}s`}
+                </td>
+                <td className="py-tight text-right tnum text-s text-body">
+                  {rate
+                    ? `${metric(row.treatment.value * 100, '%')} (${row.treatment.conversions})`
+                    : `${metric(row.treatment.value)}s`}
+                </td>
+                <td className="py-tight text-right tnum text-s text-ink">
+                  {rate ? (
+                    <>
+                      {comparison.absoluteLift >= 0 ? '+' : ''}
+                      {metric(comparison.absoluteLift * 100, ' pp')}
+                      <span className="block text-caption text-muted">
+                        95% CI [{metric(comparison.differenceLower * 100, '')},{' '}
+                        {metric(comparison.differenceUpper * 100, ' pp')}]
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {row.treatment.value - row.control.value >= 0 ? '+' : ''}
+                      {metric(row.treatment.value - row.control.value, 's')}
+                      <span className="block text-caption text-muted">
+                        {relative === null
+                          ? 'directional'
+                          : `${relative >= 0 ? '+' : ''}${metric(relative * 100, '% directional')}`}
+                      </span>
+                    </>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+
+
+const SECTIONS = ['hero', 'value-prop', 'outcomes', 'faq', 'apply'] as const
 const LAYOUTS = ['mobile', 'tablet', 'desktop', 'wide'] as const
 const ARMS = ['all', 'control', 'treatment'] as const
 
@@ -139,6 +217,18 @@ export default async function AnalyticsDashboard({ searchParams }: {
     getDashboardHeatmap(days, section, kind, layout, arm),
     getStoredExperiments(),
   ])
+  const comparisons = new Map<string, ExperimentComparisonRow[]>(
+    await Promise.all(
+      storedExperiments
+        .filter((row) => row.control_visitors + row.treatment_visitors > 0)
+        .map(async (row) =>
+          [
+            `${row.experiment_id}:${row.version}`,
+            await getExperimentComparison(row.experiment_id, row.version),
+          ] as const,
+        ),
+    ),
+  )
   const cookieStore = await cookies()
   const internal = cookieStore.has('ccc_internal')
 
@@ -418,6 +508,18 @@ export default async function AnalyticsDashboard({ searchParams }: {
                         {stored && stored.status !== 'ended' && <button name="action" value="end" className="min-h-[44px] px-[12px] text-label font-medium uppercase text-muted hover:text-ink">End</button>}
                       </form>
                     </div>
+                    {(() => {
+                      const rows = stored ? comparisons.get(`${stored.experiment_id}:${stored.version}`) : undefined
+                      if (!rows?.length) return null
+                      return (
+                        <>
+                          <ExperimentComparisonTable rows={rows} />
+                          <p className="mt-tight text-caption text-muted">
+                            Per-arm heatmaps: pick control or treatment in the attention map above.
+                          </p>
+                        </>
+                      )
+                    })()}
                   </article>
                 )
               })}

@@ -21,6 +21,8 @@ import {
   heatmapCell,
   isHesitation,
   rageCluster,
+  sectionCountsAsViewed,
+  SECTION_VIEW_THRESHOLDS,
   type ExpectedOutcome,
   type Point,
 } from '@/lib/analytics/behavior'
@@ -300,12 +302,13 @@ export function AnalyticsTracker({ enabled, heatmapSample, experiment }: Props) 
     const sectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         const id = (entry.target as HTMLElement).id
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.25 && id && !seenSections.has(id)) {
+        const viewed = sectionCountsAsViewed(entry.intersectionRatio, entry.intersectionRect.height, window.innerHeight)
+        if (entry.isIntersecting && viewed && id && !seenSections.has(id)) {
           seenSections.add(id)
           push('section_view', { sectionId: id })
         }
       }
-    }, { threshold: [0.25] })
+    }, { threshold: SECTION_VIEW_THRESHOLDS })
     document.querySelectorAll<HTMLElement>('main section[id]').forEach((section) => sectionObserver.observe(section))
 
     push('page_view')

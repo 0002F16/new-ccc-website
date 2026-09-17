@@ -2,7 +2,6 @@ import {
   Band,
   Display,
   Eyebrow,
-  Lede,
   LogoCarousel,
   ProofWall,
   Reveal,
@@ -10,6 +9,7 @@ import {
   Stack,
   VideoEmbed,
 } from '@/components/ui'
+import type { OutcomesOrder } from '@/lib/analytics/types'
 import { WALL } from './proof-shots'
 
 /**
@@ -180,7 +180,48 @@ const VIDEOS: readonly Video[] = [
   },
 ]
 
-export function Outcomes() {
+/**
+ * `order` is the `outcomes-videos-first-v1` experiment (17 September 2026).
+ * `wall-first` is the page as it stood; `videos-first` swaps the two registers
+ * and nothing else. The lede follows the order so it never describes the page
+ * backwards.
+ */
+export function Outcomes({ order = 'wall-first' }: { order?: OutcomesOrder }) {
+  const wall = (
+    <Stack gap="flow">
+      <Reveal delay={0.04}>
+        <ProofWall shots={WALL} />
+      </Reveal>
+    </Stack>
+  )
+
+  const videos = (
+    <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
+      <Reveal delay={0.04}>
+        <VideoEmbed
+          id={FEATURE.id}
+          title={FEATURE.title}
+          control="accent"
+          poster="max"
+        />
+      </Reveal>
+
+      <Reveal delay={0.08}>
+        <ul className="grid grid-cols-1 gap-flow-m sm:grid-cols-2 md:gap-flow lg:grid-cols-3">
+          {VIDEOS.map((video) => (
+            <li key={video.id} className="flex flex-col gap-tight">
+              <VideoEmbed id={video.id} title={video.title} control="quiet" />
+              <span className="text-s text-ink">{video.title}</span>
+              <span className="text-caption text-muted">{video.strap}</span>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
+    </Band>
+  )
+
+  const videosFirst = order === 'videos-first'
+
   return (
     <Section id="outcomes" width="bleed">
       <Stack gap="block">
@@ -190,11 +231,6 @@ export function Outcomes() {
             <Display as="h2" size="h2">
               The results speak for themselves
             </Display>
-            <div className="pt-flow-m md:pt-flow">
-              <Lede>
-                Posts from the client community and nine filmed conversations.
-              </Lede>
-            </div>
           </Band>
         </Reveal>
 
@@ -204,36 +240,8 @@ export function Outcomes() {
           </Reveal>
         </Band>
 
-        {/* Register 1 — the wall, at the section's full bleed width. */}
-        <Stack gap="flow">
-          <Reveal delay={0.04}>
-            <ProofWall shots={WALL} />
-          </Reveal>
-        </Stack>
-
-        {/* Register 2 — the nine videos, 3×3, banded back to structure. */}
-        <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
-          <Reveal delay={0.04}>
-            <VideoEmbed
-              id={FEATURE.id}
-              title={FEATURE.title}
-              control="accent"
-              poster="max"
-            />
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <ul className="grid grid-cols-1 gap-flow-m sm:grid-cols-2 md:gap-flow lg:grid-cols-3">
-              {VIDEOS.map((video) => (
-                <li key={video.id} className="flex flex-col gap-tight">
-                  <VideoEmbed id={video.id} title={video.title} control="quiet" />
-                  <span className="text-s text-ink">{video.title}</span>
-                  <span className="text-caption text-muted">{video.strap}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </Band>
+        {videosFirst ? videos : wall}
+        {videosFirst ? wall : videos}
       </Stack>
     </Section>
   )
