@@ -533,6 +533,10 @@ recolour the artefact — it is evidence, and altering it makes it worthless.
 `surface`, `1px line`, `4px` radius, `12px 14px`, `body` size. Label above in
 `label` small caps, `muted`. Error text in `accent` below the field, stating
 what is wrong and how to fix it. Never placeholder-as-label.
+Optional hint between the label and the control, `caption` in `muted`, for a
+prompt the reader needs before typing. It stays visible when an error shows, and
+the control is described by both. Added 25 September 2026 for the search
+question.
 
 ### Choice group
 Added 10 September 2026 for the application form's urgency question. A
@@ -579,7 +583,8 @@ PDF or Word.
 Added 10 September 2026. The page's conversion point, in `#apply` at
 `w-narrow`. Anatomy, top to bottom: eyebrow → `h2` → one `body` sentence → the
 fields in fixed order (name · email · phone field · choice group for when
-they need a job · why they want to work with us · CV field) → primary
+they need a job · their search so far (renamed from "why they want to work with
+us", 25 September 2026) · CV field) → primary
 submit → `caption` privacy line. Gap `space-flow` between fields.
 
 States: **idle**; **submitting** (button disabled, label unchanged);

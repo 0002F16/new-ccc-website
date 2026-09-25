@@ -84,7 +84,7 @@ test('records the application funnel without recording entered values', async ({
   await page.getByLabel('Email').fill('private-analytics@example.com')
   await page.getByLabel('Phone number').fill('+48512345678')
   await page.getByLabel('Within a month').check()
-  await page.getByLabel('Why do you want to work with us?').fill('This private answer must never appear in analytics payloads.')
+  await page.getByLabel('Your search so far').fill('This private answer must never appear in analytics payloads.')
   await page.locator('#cvFile').setInputFiles({
     name: 'private-resume.pdf',
     mimeType: 'application/pdf',

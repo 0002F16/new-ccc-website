@@ -114,9 +114,9 @@ export const applicationSchema = z.object({
   }),
   needJobBy: z.enum(NEED_JOB_BY_VALUES, { error: 'Choose when you need a new job by.' }),
   reason: z
-    .string({ error: 'Tell us why you want to work with us.' })
+    .string({ error: 'Tell us where your search has got to.' })
     .trim()
-    .min(1, 'Tell us why you want to work with us.')
+    .min(1, 'Tell us where your search has got to.')
     .min(20, 'Add a little more: two or three sentences is enough.')
     .max(600, 'Keep this under 600 characters.'),
   cvLink: z

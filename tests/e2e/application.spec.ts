@@ -29,7 +29,7 @@ test('an empty submission shows every field error, phone and CV included', async
   await expect(page.getByText('Enter your full name.')).toBeVisible()
   await expect(page.getByText('Enter your phone number.')).toBeVisible()
   await expect(page.getByText('Choose when you need a new job by.')).toBeVisible()
-  await expect(page.getByText('Tell us why you want to work with us.')).toBeVisible()
+  await expect(page.getByText('Tell us where your search has got to.')).toBeVisible()
   await expect(page.getByText('Attach your CV (PDF or Word, up to 10 MB).')).toBeVisible()
   await expect(page.locator('#name')).toBeFocused()
 })
@@ -106,10 +106,20 @@ test('a CV file is sent as multipart and replaced by a confirmation', async ({ p
   expect(body).toContain('filename="Ada CV.pdf"')
 })
 
-test('there is no CV link field or reason hint', async ({ page }) => {
+test('there is no CV link field', async ({ page }) => {
   await page.goto('/#apply')
   await expect(page.locator('#cvLink')).toHaveCount(0)
-  await expect(page.getByText('Two or three sentences is enough.')).toHaveCount(0)
+})
+
+test('the search question keeps its prompt visible and described, even on error', async ({ page }) => {
+  await page.goto('/#apply')
+  const reason = page.getByLabel('Your search so far')
+  await expect(page.locator('#reason-hint')).toContainText('What have you tried')
+  await expect(reason).toHaveAttribute('aria-describedby', 'reason-hint')
+  await reason.fill('Too short')
+  await page.getByRole('button', { name: SUBMIT }).click()
+  await expect(page.locator('#reason-hint')).toBeVisible()
+  await expect(reason).toHaveAttribute('aria-describedby', 'reason-hint reason-error')
 })
 
 test('a file that is not a real PDF is refused before sending', async ({ page }) => {

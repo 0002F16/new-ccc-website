@@ -222,7 +222,8 @@ export function ApplicationForm() {
               />
               <Field
                 id="reason"
-                label="Why do you want to work with us?"
+                label="Your search so far"
+                hint="What have you tried, what hasn't worked, and why do you want help now? A few honest sentences is plenty. This is the answer we read most closely."
                 as="textarea"
                 required
                 maxLength={600}

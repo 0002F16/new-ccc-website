@@ -1,6 +1,6 @@
 import { cx } from './cx'
 
-/** Form field — label above in small caps. Never placeholder-as-label. */
+/** Form field — label above in small caps, optional hint under it. Never placeholder-as-label. */
 export function Field({
   id,
   label,
@@ -34,8 +34,9 @@ export function Field({
 }) {
   const control =
     'w-full rounded border border-line bg-surface px-[14px] py-[12px] text-base text-ink transition-colors duration-ui ease-ui placeholder:text-muted hover:border-muted focus:border-accent focus-visible:border-accent'
-  const hintId = hint && !error ? `${id}-hint` : undefined
+  const hintId = hint ? `${id}-hint` : undefined
   const errorId = error ? `${id}-error` : undefined
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
   const shared = {
     id,
     name: id,
@@ -45,22 +46,22 @@ export function Field({
     defaultValue,
     className: control,
     'aria-invalid': error ? true : undefined,
-    'aria-describedby': errorId ?? hintId,
+    'aria-describedby': describedBy,
   }
   return (
     <div className={cx('flex flex-col gap-tight', className)}>
       <label htmlFor={id} className="text-label font-medium uppercase text-muted">
         {label}
       </label>
-      {as === 'textarea' ? (
-        <textarea {...shared} rows={4} />
-      ) : (
-        <input {...shared} type={type} autoComplete={autoComplete} inputMode={inputMode} />
-      )}
       {hintId && (
         <p id={hintId} className="text-caption text-muted">
           {hint}
         </p>
+      )}
+      {as === 'textarea' ? (
+        <textarea {...shared} rows={4} />
+      ) : (
+        <input {...shared} type={type} autoComplete={autoComplete} inputMode={inputMode} />
       )}
       {error && (
         <p id={errorId} className="text-caption text-accent" role="alert">
