@@ -733,6 +733,12 @@ look:
   settled by 1.2s). Spacing matches theirs: 104px section padding (64px
   mobile), 40px per block, 8px from number to caption. Fail-open without JS; static under reduced
   motion.
+- **The no-video hero became the homepage default on 25 September 2026**, at the
+  owner's call, and `hero-no-video-v1` was ended. Over 17 to 25 September:
+  hero CTA clicks 11/28 visitors vs 6/26, applications 2 vs 1. Directional,
+  not significant (p ≈ 0.25). The video hero now renders only when a running
+  `hero.layout` experiment assigns it, so `hero-headline-recognition-v1` (which
+  restyles the video hero) has no visible effect until that changes.
 
 ## Motion
 

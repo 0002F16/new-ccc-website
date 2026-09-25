@@ -269,8 +269,8 @@ describe('hero no-video experiment', () => {
     const treatment = { ...control, variantKey: 'treatment' as const }
     expect(experimentHeroLayout(definition, control)).toBe('video')
     expect(experimentHeroLayout(definition, treatment)).toBe('no-video')
-    expect(experimentHeroLayout(null, null)).toBe('video')
-    expect(experimentHeroLayout(EXPERIMENT_REGISTRY[0], treatment)).toBe('video')
+    expect(experimentHeroLayout(null, null)).toBe('no-video')
+    expect(experimentHeroLayout(EXPERIMENT_REGISTRY[0], treatment)).toBe('no-video')
     expect(experimentHeroCopy(definition, treatment)).toBeNull()
     expect(experimentOutcomesOrder(definition, treatment)).toBe('wall-first')
   })

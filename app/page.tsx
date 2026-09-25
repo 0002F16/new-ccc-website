@@ -23,6 +23,10 @@ import { databaseConfigured } from '@/lib/db'
  * 17 September 2026: 02-value-prop-scroll (placeholder) replaces
  * 02-two-situations and 04-three-bottlenecks on the page.
  *
+ * 25 September 2026: the no-video hero is the default after
+ * hero-no-video-v1 ended. The video hero renders only when a running
+ * hero.layout experiment assigns it.
+ *
  * Uncomposed, files kept on disk:
  *   02-two-situations    replaced by 02-value-prop-scroll
  *   04-three-bottlenecks replaced by 02-value-prop-scroll

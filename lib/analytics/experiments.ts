@@ -103,6 +103,6 @@ export function experimentHeroLayout(
   definition: ExperimentDefinition | null,
   context: ExperimentContext,
 ): HeroLayout {
-  if (!definition || !context || definition.slot !== 'hero.layout') return 'video'
-  return definition.variants.find((variant) => variant.key === context.variantKey)?.value.layout ?? 'video'
+  if (!definition || !context || definition.slot !== 'hero.layout') return 'no-video'
+  return definition.variants.find((variant) => variant.key === context.variantKey)?.value.layout ?? 'no-video'
 }
