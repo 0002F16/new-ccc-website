@@ -10,12 +10,13 @@ type Settings = {
   fromName: string
   fromEmail: string
   hasPassword: boolean
+  calendlyUrl: string
   templates: Record<Kind, { subject: string; body: string }>
 }
 
 const KINDS: { kind: Kind; title: string; when: string }[] = [
   { kind: 'received', title: 'Application received', when: 'Sent as soon as an application arrives.' },
-  { kind: 'accepted', title: 'Accepted', when: 'Sent on Accept, never sooner than 5 hours after they applied.' },
+  { kind: 'accepted', title: 'Accepted', when: 'Sent on Accept, never sooner than 5 hours after they applied. The 48-hour booking window starts when this email is sent. {reasonLine} is the selected reason; {bookingUrl} is the CCC website link.' },
   { kind: 'rejected', title: 'Rejected', when: 'Sent on Reject, never sooner than 5 hours after they applied.' },
 ]
 
@@ -94,6 +95,13 @@ export default async function EmailSetup({
                 <label className={label}>
                   App password {loaded.settings.hasPassword && <span className="normal-case tracking-normal text-accent">· saved, leave blank to keep</span>}
                   <input name="password" type="password" autoComplete="new-password" className={input} />
+                </label>
+              </Panel>
+
+              <Panel title="Call booking" note="Clients receive a personal CCC website link. While it is open, that link sends them to this Calendly event page.">
+                <label className={label}>
+                  Calendly event link
+                  <input name="calendlyUrl" type="url" defaultValue={loaded.settings.calendlyUrl} required placeholder="https://calendly.com/your-name/your-call" className={input} />
                 </label>
               </Panel>
 

@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         fromName: field('fromName'),
         fromEmail: field('fromEmail'),
         password: field('password'),
+        calendlyUrl: field('calendlyUrl'),
         templates: Object.fromEntries(
           KINDS.map((kind) => [kind, { subject: field(`${kind}_subject`), body: field(`${kind}_body`) }]),
         ),
