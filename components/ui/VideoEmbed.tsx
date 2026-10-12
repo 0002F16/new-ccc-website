@@ -105,6 +105,9 @@ function VideoPoster({
  *         where hq would be upscaled more than twice and look it. Costs ~200KB,
  *         so never use it for a grid: nine of them is 1.8MB of poster.
  * Both load as WebP; `posterSources` steps down to hq WebP, then hq JPEG, on error.
+ *
+ * `start` (seconds) opens the player at that point instead of 0:00. For a long
+ * interview, set it to the minute that makes the case, not the backstory.
  */
 export function VideoEmbed({
   id,
@@ -112,6 +115,7 @@ export function VideoEmbed({
   control = 'accent',
   poster = 'hq',
   priority = false,
+  start,
   className,
 }: {
   id: string
@@ -120,6 +124,8 @@ export function VideoEmbed({
   poster?: PosterQuality
   /** Load the poster eagerly and at high priority — for a video visible on arrival (e.g. the hero), never for a below-the-fold or grid tile. */
   priority?: boolean
+  /** Seconds into the video to start playback. Omit for 0:00. */
+  start?: number
   className?: string
 }) {
   const [playing, setPlaying] = useState(false)
@@ -141,7 +147,7 @@ export function VideoEmbed({
         <>
           <iframe
             ref={iframeRef}
-            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1${start ? `&start=${start}` : ''}`}
             title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

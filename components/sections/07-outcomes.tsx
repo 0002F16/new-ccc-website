@@ -1,5 +1,6 @@
 import {
   Band,
+  CtaBlock,
   Display,
   Eyebrow,
   LogoCarousel,
@@ -52,25 +53,27 @@ import { WALL } from './proof-shots'
  *    page's rhythm — prose narrows, structure widens — gains a third and widest
  *    tier, used exactly once.
  *
- * 2. VIDEOS. One featured film at the full band width, then the same nine
- *    three-across at `lg` — a 3×3 block reads as "nine" at a glance where five
+ * 2. VIDEOS. A featured pair two-across at `lg` (one film at the full band
+ *    width until 12 October 2026), then the same nine three-across at `lg` — a 3×3 block reads as "nine" at a glance where five
  *    rows of two read as a list. That reverses round 2's two-across rule, which
  *    was set on the grounds that a 16:9 embed at ~310px collapses the YouTube
  *    control bar. Three across inside `w-structure` is ~330px, above that
  *    threshold, and the tiles are facades until clicked, so nothing but a poster
  *    image is laid out at rest.
  *
- *    The featured film is the section's only `control="accent"` — a 64px gold
- *    disc, which the component permits for one video and forbids in a grid. It
- *    also takes `poster="max"`: at ~1040px the 480×360 `hqdefault` the tiles use
- *    would be upscaled more than twice and letterboxed. See `FEATURE` below for
- *    why its accessible title is not its YouTube title.
+ *    The featured pair take `poster="max"`: at ~510px each the 480×360
+ *    `hqdefault` the tiles use would be upscaled and letterboxed. See `FEATURED`
+ *    below for why their titles are not their YouTube titles and why both
+ *    controls are quiet.
  *
  * ── Gold budget ─────────────────────────────────────────────────────────────
  *
- * Zero `line-gold` elements. The eyebrow ships `hairline={false}`, the videos
- * use `control="quiet"` (nine gold discs would be nine accents). The section's
- * only accent is the eyebrow, which every section has.
+ * Zero `line-gold` elements. The eyebrow ships `hairline={false}`, every video
+ * uses `control="quiet"` (eleven gold discs would be eleven accents). The section's
+ * only accent is the eyebrow, which every section has, plus the primary button
+ * at the foot (exempt under the 9 September amendment). It closes the section
+ * whichever order the experiment serves, so a visitor who has just watched a
+ * story can act on it without scrolling past the FAQ.
  *
  * Before the three proof registers, a restrained employer rail locates the
  * market the reader is navigating. Its accessible name identifies it as a set
@@ -83,8 +86,8 @@ import { WALL } from './proof-shots'
  * ── What is still open ──────────────────────────────────────────────────────
  *
  * Consent per person, service actually received (DFY or coaching), and absolute
- * dates — for all thirty-nine screenshots and all ten videos, the featured film
- * included. Note that with
+ * dates — for all thirty-nine screenshots and all eleven videos, the featured
+ * pair included. Note that with
  * the specimen tier gone, no outcome on the wall is labelled by rung any more:
  * interviews, offers and job starts sit side by side at the same weight, and
  * only the posts' own words distinguish them. A community post
@@ -97,40 +100,65 @@ import { WALL } from './proof-shots'
  * conversation and do not assert a relationship with the employer.
  */
 
+/** A filmed case. The featured pair shows no caption; see `FEATURED`. */
+type Video = { id: string; title: string; strap?: string; start?: number }
+
 /**
- * The featured film. Added 10 September 2026 on the owner's instruction — one
- * video, ahead of the nine and much larger.
+ * The featured pair. The first film was added 10 September 2026 on the owner's
+ * instruction, one video ahead of the nine and much larger; the second joined it
+ * on 12 October 2026, also on the owner's instruction. The two are stacked at
+ * the full band width, the first above the second.
  *
- * It earns the position: it is the only long-form piece on the page, the founder
- * is in it, and the subject is an employed international in Poland moving between
- * two named employers — which is the ICP the strategy brief describes and which
- * seven of the nine below are not. Uploaded 5 September 2026, so it is also the
- * newest thing here by a year.
+ * They earn the position: they are the only long-form pieces on the page, the
+ * founder is in both, and both subjects are internationals already working in
+ * Poland who moved to a better role, which is the ICP the strategy brief
+ * describes and which seven of the nine below are not.
  *
- * TITLE IS NOT THE YOUTUBE TITLE, and this is a claim-rule decision rather than
- * an editorial one. The video is published as "Why Good Expats Make Bad Money in
- * Poland (And How She Tripled Her Pay in 30 Days" — a salary-increase claim and a
- * thirty-day timeline, both on the non-negotiable list, and neither covered by the
- * 9 September override, which reaches the hero stat row and nothing else. Setting
- * that string as page copy would publish both claims in the largest type in the
- * section. What is used instead is the first clause of the real title, verbatim
- * and unaltered, which carries no claim. The video is linked as it is; the page
- * does not repeat what the page may not say.
+ * TITLES ARE NOT THE YOUTUBE TITLES, and this is a claim-rule decision rather
+ * than an editorial one. They are not shown on the page (see below) but still
+ * name the play button and the iframe for assistive technology. The first is published as "Why Good Expats Make Bad
+ * Money in Poland (And How She Tripled Her Pay in 30 Days"; the second as "How
+ * to Get a Job in Poland That Pays 120k+ PLN a Year". Both carry salary claims
+ * and the first a thirty-day timeline, all on the non-negotiable list. What is
+ * used instead is the first clause of each real title, verbatim, which carries
+ * no claim. The videos are linked as they are; the page does not repeat what the
+ * page may not say.
  *
- * The thumbnail was checked for the same reason and is clean — two people, two
- * employer marks, "your job search done for you". No figure, no timeline.
+ * THUMBNAILS. The first was checked and is clean: two people, two employer
+ * marks, "your job search done for you". The second is not: it reads "I LEFT.
+ * THEN MY SALARY DOUBLED.", a salary-increase claim. The owner chose to show it
+ * unaltered on 12 October 2026; recorded under Accepted risk in CLAUDE.md.
  *
- * Starts at 0:00. The owner's link carried `t=1023s`, which is almost certainly
- * where they happened to be watching; opening a stranger seventeen minutes into a
- * thirty-two-minute film is not a highlight. One prop to change if it was meant.
+ * Both take the 64px gold `accent` control. Stacked at ~585px tall each, there
+ * is one per screenful, which is what the component permits; side by side they
+ * would have been two accents on one screen.
+ *
+ * NO CAPTIONS UNDER THE PAIR: no title, strap or runtime, removed 12 October
+ * 2026 at the owner's request. The thumbnails already show the people and the
+ * move, and "1 h 36 min" told a skimmer the cost of pressing play before the
+ * poster had sold it. This departs from the Video frame rule that a caption
+ * states the runtime, and from `VideoEmbed`'s note that the title sits beside
+ * it as live text; the button's `aria-label` still carries the title.
+ *
+ * The first starts at 18:40, the chapter "The Done-For-You pivot: why she
+ * handed us her job search", on the owner's call of 12 October 2026. A stranger
+ * lands on the minute the service is described, not on her backstory. The
+ * owner's original link carried `t=1023s` (17:03), the lead-in to the same
+ * moment. The second starts at 0:00: its opening chapter is a cold-open highlight.
  */
-const FEATURE = {
-  id: '8NZYSVMTdF4',
-  title: 'Why good expats make bad money in Poland',
-} as const
+const FEATURED: readonly Video[] = [
+  {
+    id: '8NZYSVMTdF4',
+    title: 'Why good expats make bad money in Poland',
+    start: 1120,
+  },
+  {
+    id: 'LqP9vXsiJz8',
+    title: 'How to get a job in Poland',
+  },
+]
 
 /** The nine testimonial videos already published on capitalcareerclub.com/en. */
-type Video = { id: string; title: string; strap: string }
 
 const VIDEOS: readonly Video[] = [
   {
@@ -196,14 +224,22 @@ export function Outcomes({ order = 'wall-first' }: { order?: OutcomesOrder }) {
   )
 
   const videos = (
-    <Band width="structure" className="flex flex-col gap-flow-m md:gap-flow">
+    <Band width="structure" className="flex flex-col gap-block-m md:gap-block">
       <Reveal delay={0.04}>
-        <VideoEmbed
-          id={FEATURE.id}
-          title={FEATURE.title}
-          control="accent"
-          poster="max"
-        />
+        <ul className="flex flex-col gap-flow-m md:gap-flow">
+          {FEATURED.map((video) => (
+            <li key={video.id}>
+              <VideoEmbed
+                id={video.id}
+                title={video.title}
+                control="accent"
+                poster="max"
+                start={video.start}
+                className="rounded-panel shadow-panel"
+              />
+            </li>
+          ))}
+        </ul>
       </Reveal>
 
       <Reveal delay={0.08}>
@@ -242,6 +278,13 @@ export function Outcomes({ order = 'wall-first' }: { order?: OutcomesOrder }) {
 
         {videosFirst ? videos : wall}
         {videosFirst ? wall : videos}
+
+        <Reveal delay={0.04}>
+          <CtaBlock
+            analyticsId="outcomes"
+            note="Thirty minutes on a call, and we tell you whether we would take this on."
+          />
+        </Reveal>
       </Stack>
     </Section>
   )

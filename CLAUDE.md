@@ -1018,6 +1018,13 @@ sentence for the KRAZ question while that question is open.
   for the hero specifically. This does **not** clear the claims audit that
   `06-video.tsx` is still waiting on — it means the salary/timeline claims are
   now live on the page regardless of that audit's outcome.
+- **Outcomes features a second film, `LqP9vXsiJz8`** (Gambar, Capgemini →
+  Novocure), side by side with `8NZYSVMTdF4`. Its YouTube thumbnail reads "I
+  LEFT. THEN MY SALARY DOUBLED.", a salary-increase claim, and is shown
+  unaltered: owner's call, 12 October 2026. The page title uses only the
+  claim-free first clause of the real title ("How to get a job in Poland"), not
+  "…That Pays 120k+ PLN a Year". Consent, service received and absolute dates
+  stay open, as for every other video.
 
 **Needed before launch, not before drafting**
 
